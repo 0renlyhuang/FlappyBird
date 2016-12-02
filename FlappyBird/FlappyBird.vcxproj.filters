@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="dependencies">
+      <UniqueIdentifier>{c80dfe0b-a61b-4390-b296-061b70390c23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{575ef255-94f6-4bfe-a8f2-72925b34aa91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dependencies\assimp">
+      <UniqueIdentifier>{3f39161e-bfe7-488e-8575-aa232d76be84}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dependencies\freeglut">
+      <UniqueIdentifier>{360405dd-0990-4581-b9d3-8eb503c99950}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dependencies\glew">
+      <UniqueIdentifier>{dca274fc-bffe-4714-8621-7daaebdc75da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dependencies\SOIL">
+      <UniqueIdentifier>{fb3fe1a3-9d4e-4cb1-94d0-0c9ffce1986f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\assimp">
+      <UniqueIdentifier>{c01f2189-341f-4c5a-8fc0-05ec1a871fe5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\freeglut">
+      <UniqueIdentifier>{1fe14a5d-d581-49a6-b103-9cccf6bf0bbc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\glew">
+      <UniqueIdentifier>{f5c3aac9-7e6b-4e2f-b61c-79cad0e859e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\glm">
+      <UniqueIdentifier>{819bd300-c4fa-4524-8844-596bd1a9d29b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shader">
+      <UniqueIdentifier>{2be2ffba-3244-48ca-9c70-e18dde89d84d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="dependencies\assimp\assimp.dll">
+      <Filter>dependencies\assimp</Filter>
+    </None>
+    <None Include="bird.vert">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="bird.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="tube.vert">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="tube.frag">
+      <Filter>shader</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="dependencies\assimp\assimp.lib">
+      <Filter>dependencies\assimp</Filter>
+    </Library>
+    <Library Include="dependencies\freeglut\freeglut.lib">
+      <Filter>dependencies\freeglut</Filter>
+    </Library>
+    <Library Include="dependencies\glew\glew32s.lib">
+      <Filter>dependencies\glew</Filter>
+    </Library>
+    <Library Include="dependencies\SOIL\SOIL.lib">
+      <Filter>dependencies\SOIL</Filter>
+    </Library>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\SOIL.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="shader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="bird.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="drawAble.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="physic.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="tube.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="collision.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
