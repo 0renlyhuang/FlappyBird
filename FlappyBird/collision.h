@@ -126,26 +126,8 @@ namespace utility {
 
 
 
-	// 矩形间的碰撞检测
-	bool CollideDetect(const Rectangle &r1, const Rectangle &r2) {
-		// 判断X上的投影是否有重叠
-		bool isXOverlap =
-			!(r1.projectToX().second < r2.projectToX().first ||
-				r1.projectToX().first > r2.projectToX().second);
-		if (!isXOverlap)
-			return false;
-
-		// 判断Y上的投影是否有重叠
-		bool isYOverlap =
-			!(r1.projectToY().second < r2.projectToY().first ||
-				r1.projectToY().first > r2.projectToY().second);
-
-		return isYOverlap;
-	}
-
-
-
 	class Rectangle;
+	bool CollideDetect(const Rectangle &r1, const Rectangle &r2);
 	// Double dispatch
 	class Geometry {
 	protected:
@@ -216,12 +198,35 @@ namespace utility {
 		bool CollideDetectWith(const Rectangle &rectangle) const override {
 			return CollideDetect(*this, rectangle);
 		}
-		
+
 
 	private:
 		PointT<float> topLeft_;
 		PointT<float> bottomRight_;
 	};
+
+
+
+
+
+
+	// 矩形间的碰撞检测
+	bool CollideDetect(const Rectangle &r1, const Rectangle &r2) {
+		// 判断X上的投影是否有重叠
+		bool isXOverlap =
+			!(r1.projectToX().second < r2.projectToX().first ||
+				r1.projectToX().first > r2.projectToX().second);
+		if (!isXOverlap)
+			return false;
+
+		// 判断Y上的投影是否有重叠
+		bool isYOverlap =
+			!(r1.projectToY().second < r2.projectToY().first ||
+				r1.projectToY().first > r2.projectToY().second);
+
+		return isYOverlap;
+	}
+
 
 
 
@@ -239,9 +244,10 @@ namespace utility {
 
 		template<typename ...Args>
 		Collidable(BoxType t, Args&& ... args) {
-			prealCollidable = std::make_shared<RealCollidable>(t, std::forward<Args>(args)...);
+			prealCollidable_ = std::make_shared<RealCollidable>(t, std::forward<Args>(args)...);
 			CollisionWorld::instance()->add(Collidable(*prealCollidable));
-			this->itor_ = CollisionWorld::instance()->getObjList().cend() - 1;
+			this->itor_ = CollisionWorld::instance()->getObjList().cend();
+			--this->itor_;
 		}
 
 
@@ -249,12 +255,31 @@ namespace utility {
 			CollisionWorld::instance()->getObjList().erase(this->itor_);
 		}
 
+		friend void swap(Collidable &lhs, Collidable &rhs) {
+			// Enable ADL
+			using std::swap;
+
+			swap(lhs.prealCollidable_, rhs.prealCollidable_);
+			swap(lhs.itor_, rhs.itor_);
+		}
+
+		Collidable(const Collidable &c) {
+			this->prealCollidable_ = c.prealCollidable_;
+			this->itor_ = CollisionWorld::instance()->getObjList().cend();
+			--this->itor_;
+		}
 
 
-		Collidable(const Collidable &) = default;
 		Collidable(Collidable &&) = default;
-		Collidable& operator=(const Collidable &) = default;
-		Collidable& operator=(Collidable &&) = default;
+
+		// Move/Copy assignment operator
+		// Copy-and-swap
+		Collidable& operator=(Collidable c) {
+			swap(*this, c);
+			return *this;
+		}
+
+		// Collidable& operator=(Collidable &&) = default;
 
 
 		bool collisionDetect(const Collidable &object) { return prealCollidable_->collisionDetect(object); }
