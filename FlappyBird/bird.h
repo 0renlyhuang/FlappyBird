@@ -10,6 +10,7 @@
 #include "physic.h"
 #include "drawAble.h"
 #include "shader.h"
+#include "collision.h"
 
 
 namespace BirdSp 
@@ -17,18 +18,19 @@ namespace BirdSp
 	auto deletor = [](GLfloat *p) {delete[] p; };
 	using ArrayDelete = decltype(deletor);
 	constexpr  std::size_t SIZE = 3 * 6;
+	constexpr GLfloat EDGE = 0.5f;
 
 	auto getVertices() 
 	{
 		return std::unique_ptr<GLfloat, ArrayDelete>(
 			new GLfloat[SIZE]
 		{
-			-0.1f,  0.1f, 0.0f,
-			-0.1f, -0.1f, 0.0f,
-			0.1f, -0.1f, 0.0f,
-			0.1f, -0.1f, 0.0f,
-			0.1f,  0.1f, 0.0f,
-			-0.1f, 0.1f, 0.0f,
+			-EDGE,  EDGE, 0.0f,
+			-EDGE, -EDGE, 0.0f,
+			EDGE, -EDGE, 0.0f,
+			EDGE, -EDGE, 0.0f,
+			EDGE,  EDGE, 0.0f,
+			-EDGE, EDGE, 0.0f,
 		},	
 		deletor);
 	}
@@ -38,8 +40,13 @@ namespace BirdSp
 
 class Bird : public DrawAble, public utility::Collidable {
 public:
+	using BoxT = utility::Collidable::BoxType;
+
 	Bird(const glm::vec3 &pos, const GLfloat speed = -1.0f) 
-		: vertices_(BirdSp::getVertices()), speed_(speed), position_(pos)
+		: vertices_(BirdSp::getVertices()), speed_(speed),
+			utility::Collidable(BoxT::RETENCGEL, 
+								utility::PointT<float>(pos.x - 0.5f * BirdSp::EDGE, pos.y + 0.5f * BirdSp::EDGE),  // Top-let 
+								utility::PointT<float>(pos.x + 0.5f * BirdSp::EDGE, pos.y - 0.5f * BirdSp::EDGE))  // Bottom-right
 	{
 		glGenVertexArrays(1, &this->VAO_);
 		glBindVertexArray(this->VAO_);
@@ -66,7 +73,8 @@ public:
 		static int cnt = 0;
 		++cnt;
 		
-		this->position_.y += utility::Motion::displacement(this->speed_, deltaTime);
+		
+		this->position().y += utility::Motion::displacement(this->speed_, deltaTime);
 		this->speed_ = utility::Motion::velocity(this->speed_, deltaTime);
 		
 		if (cnt % 100 == 0) {
@@ -79,8 +87,8 @@ public:
 		shader.use();
 		
 		glm::mat4 model;
-		model = glm::translate(model, this->position_);
-		model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+		model = glm::translate(model, this->position());
+		// model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
 		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(), "model"),
 			1, GL_FALSE, glm::value_ptr(model));
 
@@ -93,7 +101,6 @@ private:
 	const std::unique_ptr <GLfloat, BirdSp::ArrayDelete> vertices_;
 	GLfloat speed_;
 	GLuint VAO_;
-	glm::vec3 position_;
 };
 
 #endif // !BIRD_H

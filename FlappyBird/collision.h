@@ -8,9 +8,15 @@
 
 
 namespace utility {
+	template<typename T>
+	using PointT = std::pair<T, T>;
+
+	template<typename T>
+	using RangeT = std::pair<T, T>;
+
 	class Collidable;
 
-	using PCollidableT = std::shared_ptr<Collidable>;
+	// using PCollidableT = std::shared_ptr<Collidable>;
 
 	class CollisionException {};
 
@@ -18,6 +24,8 @@ namespace utility {
 	// Åö×²ÊÀ½ç
 	class CollisionWorld {
 	public:
+		using PCollidableT = std::shared_ptr<Collidable>;
+
 		// ¿ªÆôÅö×²¼ì²â
 		static void setUp() noexcept {
 			isSetUp = true;
@@ -120,7 +128,7 @@ namespace utility {
 		static bool isSetUp;
 	};
 
-	static std::shared_ptr<CollisionWorld> pCollisionWorld(nullptr);
+	std::shared_ptr<CollisionWorld> CollisionWorld::pCollisionWorld(nullptr);
 	std::list<std::shared_ptr<Collidable>> *CollisionWorld::pObjects_;
 	bool CollisionWorld::isSetUp = false;
 
@@ -130,10 +138,6 @@ namespace utility {
 	bool CollideDetect(const Rectangle &r1, const Rectangle &r2);
 	// Double dispatch
 	class Geometry {
-	protected:
-		template<typename T>
-		using RangeT = std::pair<T, T>;
-
 	public:
 		virtual RangeT<float> projectToX() const = 0;
 		virtual RangeT<float> projectToY() const = 0;
@@ -141,6 +145,7 @@ namespace utility {
 		virtual bool CollideDetectWith(const Geometry &geometry) const = 0;
 		virtual bool CollideDetectWith(const Rectangle &rectangle) const = 0;
 
+		glm::vec3 &position() noexcept {return this->position_; }
 
 		Geometry() = default;
 		Geometry(const Geometry &) = default;
@@ -148,21 +153,33 @@ namespace utility {
 		Geometry& operator=(const Geometry &) = default;
 		Geometry& operator=(Geometry &&) = default;
 		virtual ~Geometry() = default;
+		
+	protected:
+		glm::vec3 position_;
 	};
 
 
 
 	class Rectangle : public Geometry {
-	protected:
-		template<typename T>
-		using PointT = std::pair<T, T>;
 	public:
 		Rectangle(const PointT<float> &topLeft, const PointT<float> &bottomRight)
-			: topLeft_(topLeft), bottomRight_(bottomRight) {}
+			: topLeft_(topLeft), bottomRight_(bottomRight) {
+			this->position_ = { 
+								(this->topLeft_.first + this->bottomRight_.first) * 0.5f,
+								(this->topLeft_.second + this->bottomRight_.second) * 0.5f,
+								0.0f 
+							  };
+		}
 
 
 		Rectangle(PointT<float> &&topLeft, PointT<float> &&bottomRight)
-			: topLeft_(topLeft), bottomRight_(bottomRight) {}
+			: topLeft_(topLeft), bottomRight_(bottomRight) {
+			this->position_ = { 
+								(this->topLeft_.first + this->bottomRight_.first) * 0.5f,
+								(this->topLeft_.second + this->bottomRight_.second) * 0.5f,
+								0.0f 
+							  };
+		}
 
 
 		Rectangle(const Rectangle &) = default;
@@ -245,9 +262,9 @@ namespace utility {
 		template<typename ...Args>
 		Collidable(BoxType t, Args&& ... args) {
 			prealCollidable_ = std::make_shared<RealCollidable>(t, std::forward<Args>(args)...);
-			CollisionWorld::instance()->add(Collidable(*prealCollidable));
+			CollisionWorld::instance()->add(Collidable(*this->prealCollidable_));
 			this->itor_ = CollisionWorld::instance()->getObjList().cend();
-			--this->itor_;
+			// --this->itor_;
 		}
 
 
@@ -265,7 +282,10 @@ namespace utility {
 
 		Collidable(const Collidable &c) {
 			this->prealCollidable_ = c.prealCollidable_;
+			// CollisionWorld::instance()->add(*this->prealCollidable_);
 			this->itor_ = CollisionWorld::instance()->getObjList().cend();
+			auto a = CollisionWorld::instance()->getObjList();
+			auto size = a.size();
 			--this->itor_;
 		}
 
@@ -279,10 +299,10 @@ namespace utility {
 			return *this;
 		}
 
-		// Collidable& operator=(Collidable &&) = default;
-
 
 		bool collisionDetect(const Collidable &object) { return prealCollidable_->collisionDetect(object); }
+
+		auto &position() noexcept { return this->prealCollidable_->position(); }
 
 
 	private:
@@ -309,7 +329,7 @@ namespace utility {
 			RealCollidable(BoxType t, Args&& ... args) {
 				switch (t) {
 				case BoxType::RETENCGEL:
-					pBox = std::make_shared<Rectangle>(std::forward<Args>(args)...);
+					this->pBox_ = std::make_shared<Rectangle>(std::forward<Args>(args)...);
 					break;
 
 				default:
@@ -331,6 +351,8 @@ namespace utility {
 			bool collisionDetect(const RealCollidable &object) const {
 				return this->pBox_->CollideDetectWith(*object.pBox_);
 			}
+
+			glm::vec3 &position() noexcept { return this->pBox_->position(); }
 
 		private:
 			std::shared_ptr<Geometry> pBox_;

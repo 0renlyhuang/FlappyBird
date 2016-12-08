@@ -9,6 +9,7 @@
 #include "shader.h"
 #include "bird.h"
 #include "tube.h"
+#include "collision.h"
 
 
 using std::cerr;
@@ -66,6 +67,8 @@ int main(int argc, char **argv) {
 
 
 void init() {
+	utility::CollisionWorld::setUp();
+
 	pBird = std::make_unique<Bird>(glm::vec3{ 0.0f, 0.0f, 0.0f });
 	pBirdShader = std::make_unique<Shader>("bird.vert", "bird.frag");
 
@@ -101,7 +104,14 @@ void display() {
 	for (auto &ptube : tubes) {
 		ptube->shift(deltaTime);
 		ptube->draw(*pTubeShader);
+
+		// 如果碰撞
+		if (pBird->collisionDetect(ptube->getDownBox()) || pBird->collisionDetect(ptube->getUpBox())) {
+			system("Pause");
+		}
 	}
+
+	
 
 	glFlush();
 }

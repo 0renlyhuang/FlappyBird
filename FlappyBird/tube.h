@@ -9,6 +9,7 @@
 #include "glm\gtc\type_ptr.hpp"
 #include "drawAble.h"
 #include "shader.h"
+#include "collision.h"
 
 
 namespace TubeSp
@@ -16,25 +17,27 @@ namespace TubeSp
 	auto deletor = [](GLfloat *p) {delete[] p; };
 	using ArrayDelete = decltype(deletor);
 	constexpr std::size_t SIZE = 3 * 6 * 2;
+	constexpr GLfloat WIDTH = 0.1f;
+	constexpr GLfloat HEIGHT = 2.0f;
 
-	auto getVertices(const GLfloat space)
+	inline auto getVertices(const GLfloat space)
 	{
 		return std::unique_ptr<GLfloat, ArrayDelete>(
 			new GLfloat[SIZE]
-		{  // defalut height = 0.0f
-			-0.1f,  2.0f, 0.0f,
-			-0.1f, space, 0.0f,
-			0.1f, space, 0.0f,
-			0.1f, space, 0.0f,
-			0.1f,  2.0f, 0.0f,
-			-0.1f, 2.0f, 0.0f,
+		{  
+			-WIDTH,  HEIGHT, 0.0f,
+			-WIDTH, space, 0.0f,
+			WIDTH, space, 0.0f,
+			WIDTH, space, 0.0f,
+			WIDTH,  HEIGHT, 0.0f,
+			-WIDTH, HEIGHT, 0.0f,
 
-			-0.1f,  -space, 0.0f,
-			-0.1f, -2.0f, 0.0f,
-			0.1f, -2.0f, 0.0f,
-			0.1f, -2.0f, 0.0f,
-			0.1f,  -space, 0.0f,
-			-0.1f, -space, 0.0f
+			-WIDTH,  -space, 0.0f,
+			-WIDTH, -HEIGHT, 0.0f,
+			WIDTH, -HEIGHT, 0.0f,
+			WIDTH, -HEIGHT, 0.0f,
+			WIDTH,  -space, 0.0f,
+			-WIDTH, -space, 0.0f
 		},
 		deletor);
 	}
@@ -43,8 +46,16 @@ namespace TubeSp
 
 class Tube : public DrawAble {
 public:
+	using BoxT = utility::Collidable::BoxType;
+
 	Tube(const glm::vec3 pos = { 0.0f, 0.0f, 0.0f }, const GLfloat height = 0.0f, const GLfloat space = 0.3f)
-		: position_(pos), vertices_(TubeSp::getVertices(space)), height_(height)
+		: position_(pos), vertices_(TubeSp::getVertices(space)),
+		upBox_(BoxT::RETENCGEL,
+			utility::PointT<float>(pos.x - 0.5f * TubeSp::WIDTH, pos.y + 0.5f * space + TubeSp::HEIGHT),  // UpBox top-left
+			utility::PointT<float>(pos.x + 0.5f * TubeSp::WIDTH, pos.y + 0.5f * space)),  // UpBox bottom-right
+		downBox_(BoxT::RETENCGEL,
+			utility::PointT<float>(pos.x - 0.5f * TubeSp::WIDTH, pos.y - 0.5f * space + TubeSp::HEIGHT),  // DownBox top-left
+			utility::PointT<float>(pos.x + 0.5f * TubeSp::WIDTH, pos.y - 0.5f * space))  // DownBox bottom-right	
 	{
 		glGenVertexArrays(1, &this->VAO_);
 		glBindVertexArray(this->VAO_);
@@ -78,14 +89,21 @@ public:
 
 	void shift(const GLfloat deltaTime) {
 		this->position_.x += this->speed_ * deltaTime;
-		
+		this->upBox_.position().x += this->speed_ * deltaTime;
+		this->downBox_.position().x += this->speed_ * deltaTime;
 	}
+
+	auto getUpBox() const noexcept { return this->upBox_; }
+	auto getDownBox() const noexcept { return this->downBox_; }
+
+
 private:
 	const std::unique_ptr <GLfloat, TubeSp::ArrayDelete> vertices_;
 	GLuint VAO_;
-	GLfloat height_;
 	glm::vec3 position_;
 	const static GLfloat speed_;
+	utility::Collidable upBox_;
+	utility::Collidable downBox_;
 };
 
 
