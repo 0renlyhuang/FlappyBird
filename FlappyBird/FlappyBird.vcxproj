@@ -152,6 +152,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="collidable.cpp" />
+    <ClCompile Include="collisionWorld.cpp" />
+    <ClCompile Include="collisionDetect.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -169,8 +172,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bird.h" />
-    <ClInclude Include="collision.h" />
+    <ClInclude Include="collidable.h" />
+    <ClInclude Include="collisionWorld.h" />
     <ClInclude Include="drawAble.h" />
+    <ClInclude Include="geometry.h" />
     <ClInclude Include="include\SOIL.h" />
     <ClInclude Include="physic.h" />
     <ClInclude Include="shader.h" />

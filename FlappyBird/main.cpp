@@ -9,7 +9,7 @@
 #include "shader.h"
 #include "bird.h"
 #include "tube.h"
-#include "collision.h"
+#include "collisionWorld.h"
 
 
 using std::cerr;
@@ -27,7 +27,7 @@ bool isSpaceDown = false;
 GLfloat deltaTime = 0.0;
 GLfloat lastFrame = 0.0;
 
-constexpr std::size_t tubeNum = 200;
+constexpr std::size_t tubeNum = 1;
 
 unique_ptr<Bird> pBird;
 unique_ptr<Shader> pTubeShader;
@@ -76,7 +76,7 @@ void init() {
 
 	for (int i = 0; i < tubeNum; ++i) {
 		tubes.emplace_back(std::make_unique<Tube>(
-			glm::vec3(0.0f + 0.5f * static_cast<float>(i), (static_cast<int>(e() % 9) - 4) * 0.1f, 0.0f)
+			glm::vec3(0.2f + 0.5f * static_cast<float>(i), (static_cast<int>(e() % 9) - 4) * 0.1f, 0.0f)
 			));
 	}
 	pTubeShader = std::make_unique<Shader>("tube.vert", "tube.frag");
@@ -102,13 +102,24 @@ void display() {
 	pBird->draw(*pBirdShader);
 
 	for (auto &ptube : tubes) {
+		static int cnt = 0;
+		++cnt;
 		ptube->shift(deltaTime);
 		ptube->draw(*pTubeShader);
 
+		auto bird_position = pBird->position();  // 0.05
+		auto down_box = ptube->getDownBox().position();  // 0.1*2
+		auto up_box = ptube->getUpBox().position();
 		// 如果碰撞
 		if (pBird->collisionDetect(ptube->getDownBox()) || pBird->collisionDetect(ptube->getUpBox())) {
-			system("Pause");
+   			system("Pause");
+		//	std::cout << "bird  position\n" <<
+		//		pBird->position().x << "\n" <<
+		//		pBird->position().y << "\n" <<
+		//		pBird->position().z << "\n" <<
+		//		endl;
 		}
+		auto a = 0;
 	}
 
 	
@@ -121,6 +132,32 @@ void display() {
 void spaceDown(unsigned char key, int, int) {
 	if (key == ' ') {
 		isSpaceDown = true;
+	}
+	if (key == '1') {
+			std::cout << "\n\n\n\nbird  position\n" <<
+				"x: " << pBird->position().x << "\n" <<
+				"y: " << pBird->position().y << "\n" <<
+				"z: " << pBird->position().z << "\n" <<
+				endl;
+
+			std::cout << "\n\n\n\ntube  position\n" <<
+				"x: " << tubes[0]->position_.x << "\n" <<
+				"y: " << tubes[0]->position_.y << "\n" <<
+				"z: " << tubes[0]->position_.z << "\n" <<
+				endl;
+
+			std::cout <<  
+				"UP:\n" << 
+				"Top-let: " << tubes[0]->position_.x - 0.5f * TubeSp::WIDTH << " " <<
+				tubes[0]->position_.y + 0.5f * 0.3f + TubeSp::HEIGHT << "\n" <<
+				"Bottom-right: " << tubes[0]->position_.x + 0.5f * TubeSp::WIDTH << " " <<
+				tubes[0]->position_.y + 0.5f * 0.3f << "\n" <<
+				"down:\n" <<
+				"Top-let: " << tubes[0]->position_.x - 0.5f * TubeSp::WIDTH << " " <<
+				tubes[0]->position_.y - 0.5f * 0.3f << "\n" <<
+				"Bottom-right: " << tubes[0]->position_.x + 0.5f * TubeSp::WIDTH << " " <<
+				tubes[0]->position_.y - 0.5f * 0.3f - TubeSp::HEIGHT << "\n" << endl;
+		system("Pause");
 	}
 }
 

@@ -32,7 +32,7 @@ namespace utility {
 }
 
 const float utility::Motion::aUp = 200.0f;
-const float utility::Motion::aDown = 300.0f;
+const float utility::Motion::aDown = /*0.0001f;*/300.0f;
 
 
 

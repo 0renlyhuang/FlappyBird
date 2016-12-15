@@ -10,7 +10,7 @@
 #include "physic.h"
 #include "drawAble.h"
 #include "shader.h"
-#include "collision.h"
+#include "collisionWorld.h"
 
 
 namespace BirdSp 
@@ -18,7 +18,7 @@ namespace BirdSp
 	auto deletor = [](GLfloat *p) {delete[] p; };
 	using ArrayDelete = decltype(deletor);
 	constexpr  std::size_t SIZE = 3 * 6;
-	constexpr GLfloat EDGE = 0.5f;
+	constexpr GLfloat EDGE = 0.05f;
 
 	auto getVertices() 
 	{
@@ -48,6 +48,12 @@ public:
 								utility::PointT<float>(pos.x - 0.5f * BirdSp::EDGE, pos.y + 0.5f * BirdSp::EDGE),  // Top-let 
 								utility::PointT<float>(pos.x + 0.5f * BirdSp::EDGE, pos.y - 0.5f * BirdSp::EDGE))  // Bottom-right
 	{
+		std::cout << "bird initial position\n" <<
+			"Top-let: " << pos.x - 0.5f * BirdSp::EDGE << " " << 
+				pos.y + 0.5f * BirdSp::EDGE << " " << 
+			"Bottom-right: " << pos.x + 0.5f * BirdSp::EDGE << " " << 
+				pos.y - 0.5f * BirdSp::EDGE << "\n" << endl;
+
 		glGenVertexArrays(1, &this->VAO_);
 		glBindVertexArray(this->VAO_);
 
@@ -77,10 +83,13 @@ public:
 		this->position().y += utility::Motion::displacement(this->speed_, deltaTime);
 		this->speed_ = utility::Motion::velocity(this->speed_, deltaTime);
 		
-		if (cnt % 100 == 0) {
-			cout << "deltaTime: " << deltaTime << endl;
-			cout << this->speed_ << endl;
-		}
+		// if (cnt % 100 == 0) {
+			//cout << "bird: \n";
+			//cout << "deltaTime: " << deltaTime << endl;
+			//cout << "speed: " <<  this->speed_ << endl;
+			//cout << "position: " << this->position().x << " " << this->position().y << " " << this->position().z << endl;
+			//cout << endl;
+		// }
 	}
 
 	void draw(Shader &shader) override {

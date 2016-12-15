@@ -51,6 +51,15 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="collisionWorld.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="collidable.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="collisionDetect.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="dependencies\assimp\assimp.dll">
@@ -102,7 +111,13 @@
     <ClInclude Include="tube.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="collision.h">
+    <ClInclude Include="geometry.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="collisionWorld.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="collidable.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

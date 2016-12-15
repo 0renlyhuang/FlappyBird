@@ -9,7 +9,7 @@
 #include "glm\gtc\type_ptr.hpp"
 #include "drawAble.h"
 #include "shader.h"
-#include "collision.h"
+#include "collisionWorld.h"
 
 
 namespace TubeSp
@@ -54,9 +54,21 @@ public:
 			utility::PointT<float>(pos.x - 0.5f * TubeSp::WIDTH, pos.y + 0.5f * space + TubeSp::HEIGHT),  // UpBox top-left
 			utility::PointT<float>(pos.x + 0.5f * TubeSp::WIDTH, pos.y + 0.5f * space)),  // UpBox bottom-right
 		downBox_(BoxT::RETENCGEL,
-			utility::PointT<float>(pos.x - 0.5f * TubeSp::WIDTH, pos.y - 0.5f * space + TubeSp::HEIGHT),  // DownBox top-left
-			utility::PointT<float>(pos.x + 0.5f * TubeSp::WIDTH, pos.y - 0.5f * space))  // DownBox bottom-right	
+			utility::PointT<float>(pos.x - 0.5f * TubeSp::WIDTH, pos.y - 0.5f * space),  // DownBox top-left
+			utility::PointT<float>(pos.x + 0.5f * TubeSp::WIDTH, pos.y - 0.5f * space - TubeSp::HEIGHT))  // DownBox bottom-right	
 	{
+		std::cout << "tube initial position\n" << 
+			"UP:\n" << 
+			"Top-let: " << pos.x - 0.5f * TubeSp::WIDTH << " " <<
+			pos.y + 0.5f * space + TubeSp::HEIGHT << "\n" <<
+			"Bottom-right: " << pos.x + 0.5f * TubeSp::WIDTH << " " <<
+			pos.y + 0.5f * space << "\n" << 
+			"down:\n" <<
+			"Top-let: " << pos.x - 0.5f * TubeSp::WIDTH << " " <<
+			pos.y - 0.5f * space << "\n" <<
+			"Bottom-right: " << pos.x + 0.5f * TubeSp::WIDTH << " " <<
+			pos.y - 0.5f * space - TubeSp::HEIGHT << "\n" << endl;
+
 		glGenVertexArrays(1, &this->VAO_);
 		glBindVertexArray(this->VAO_);
 
@@ -96,14 +108,16 @@ public:
 	auto getUpBox() const noexcept { return this->upBox_; }
 	auto getDownBox() const noexcept { return this->downBox_; }
 
-
+	glm::vec3 position_;
+	utility::Collidable upBox_;
+	utility::Collidable downBox_;
 private:
 	const std::unique_ptr <GLfloat, TubeSp::ArrayDelete> vertices_;
 	GLuint VAO_;
-	glm::vec3 position_;
+	//glm::vec3 position_;
 	const static GLfloat speed_;
-	utility::Collidable upBox_;
-	utility::Collidable downBox_;
+	//utility::Collidable upBox_;
+	//utility::Collidable downBox_;
 };
 
 
