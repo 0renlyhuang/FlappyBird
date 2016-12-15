@@ -44,15 +44,13 @@ public:
 
 	Bird(const glm::vec3 &pos, const GLfloat speed = -1.0f) 
 		: vertices_(BirdSp::getVertices()), speed_(speed),
-			utility::Collidable(BoxT::RETENCGEL, 
-								utility::PointT<float>(pos.x - 0.5f * BirdSp::EDGE, pos.y + 0.5f * BirdSp::EDGE),  // Top-let 
-								utility::PointT<float>(pos.x + 0.5f * BirdSp::EDGE, pos.y - 0.5f * BirdSp::EDGE))  // Bottom-right
+			utility::Collidable(BoxT::RETENCGEL, pos, BirdSp::EDGE, BirdSp::EDGE)
 	{
-		std::cout << "bird initial position\n" <<
-			"Top-let: " << pos.x - 0.5f * BirdSp::EDGE << " " << 
-				pos.y + 0.5f * BirdSp::EDGE << " " << 
-			"Bottom-right: " << pos.x + 0.5f * BirdSp::EDGE << " " << 
-				pos.y - 0.5f * BirdSp::EDGE << "\n" << endl;
+		//std::cout << "bird initial position\n" <<
+		//	"Top-let: " << pos.x - 0.5f * BirdSp::EDGE << " " << 
+		//		pos.y + 0.5f * BirdSp::EDGE << " " << 
+		//	"Bottom-right: " << pos.x + 0.5f * BirdSp::EDGE << " " << 
+		//		pos.y - 0.5f * BirdSp::EDGE << "\n" << endl;
 
 		glGenVertexArrays(1, &this->VAO_);
 		glBindVertexArray(this->VAO_);

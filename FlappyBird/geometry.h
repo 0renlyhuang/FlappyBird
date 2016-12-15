@@ -31,7 +31,9 @@ namespace utility {
 
 		glm::vec3 &position() noexcept { return this->position_; }
 
-		Geometry() = default;
+
+		Geometry(const glm::vec3 &pos) : position_(pos) {};
+		Geometry(glm::vec3 &&pos) : position_(pos) {};
 		Geometry(const Geometry &) = default;
 		Geometry(Geometry &&) = default;
 		Geometry& operator=(const Geometry &) = default;
@@ -39,6 +41,7 @@ namespace utility {
 		virtual ~Geometry() = default;
 
 	protected:
+		glm::vec3 position() const noexcept { return this->position_; }
 		glm::vec3 position_;
 	};
 
@@ -46,24 +49,12 @@ namespace utility {
 
 	class Rectangle : public Geometry {
 	public:
-		Rectangle(const PointT<float> &topLeft, const PointT<float> &bottomRight)
-			: topLeft_(topLeft), bottomRight_(bottomRight) {
-			this->position_ = {
-				(this->topLeft_.first + this->bottomRight_.first) * 0.5f,
-				(this->topLeft_.second + this->bottomRight_.second) * 0.5f,
-				0.0f
-			};
-		}
+		Rectangle(const glm::vec3 &pos, float width, float height)
+			: Geometry(pos), width_(width), height_(height) { }
 
 
-		Rectangle(PointT<float> &&topLeft, PointT<float> &&bottomRight)
-			: topLeft_(topLeft), bottomRight_(bottomRight) {
-			this->position_ = {
-				(this->topLeft_.first + this->bottomRight_.first) * 0.5f,
-				(this->topLeft_.second + this->bottomRight_.second) * 0.5f,
-				0.0f
-			};
-		}
+		Rectangle(glm::vec3 &&pos, float width, float height)
+			: Geometry(pos), width_(width), height_(height) { }
 
 
 		Rectangle(const Rectangle &) = default;
@@ -76,18 +67,18 @@ namespace utility {
 		// 投影到X轴
 		RangeT<float> projectToX() const override {
 			return
-				this->topLeft_.first <= this->bottomRight_.first ?
-				std::make_pair(this->topLeft_.first, this->bottomRight_.first) :
-				std::make_pair(this->bottomRight_.first, this->topLeft_.first);
+				this->topLeft().first <= this->bottomRight().first ?
+				std::make_pair(this->topLeft().first, this->bottomRight().first) :
+				std::make_pair(this->bottomRight().first, this->topLeft().first);
 		}
 
 
 		// 投影到Y轴
 		RangeT<float> projectToY() const override {
 			return
-				this->bottomRight_.second <= this->topLeft_.second ?
-				std::make_pair(this->bottomRight_.second, this->topLeft_.second) :
-				std::make_pair(this->topLeft_.second, this->bottomRight_.second);
+				this->bottomRight().second <= this->topLeft().second ?
+				std::make_pair(this->bottomRight().second, this->topLeft().second) :
+				std::make_pair(this->topLeft().second, this->bottomRight().second);
 		}
 
 
@@ -102,8 +93,14 @@ namespace utility {
 
 
 	private:
-		PointT<float> topLeft_;
-		PointT<float> bottomRight_;
+		PointT<float> topLeft() const noexcept { return PointT<float>(this->position().x - 0.5f * this->width_, 
+																this->position().y + 0.5f * this->height_); }
+
+		PointT<float> bottomRight() const noexcept {return PointT<float>(this->position().x + 0.5f * this->width_,
+																   this->position().y - 0.5f * this->height_); }
+
+		float width_;
+		float height_;
 	};
 
 }

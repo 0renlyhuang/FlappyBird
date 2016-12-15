@@ -51,23 +51,21 @@ public:
 	Tube(const glm::vec3 pos = { 0.0f, 0.0f, 0.0f }, const GLfloat height = 0.0f, const GLfloat space = 0.3f)
 		: position_(pos), vertices_(TubeSp::getVertices(space)),
 		upBox_(BoxT::RETENCGEL,
-			utility::PointT<float>(pos.x - 0.5f * TubeSp::WIDTH, pos.y + 0.5f * space + TubeSp::HEIGHT),  // UpBox top-left
-			utility::PointT<float>(pos.x + 0.5f * TubeSp::WIDTH, pos.y + 0.5f * space)),  // UpBox bottom-right
+			glm::vec3(pos.x, pos.y + 0.5f * (space + TubeSp::HEIGHT), pos.z), TubeSp::WIDTH, TubeSp::HEIGHT), // UpBox
 		downBox_(BoxT::RETENCGEL,
-			utility::PointT<float>(pos.x - 0.5f * TubeSp::WIDTH, pos.y - 0.5f * space),  // DownBox top-left
-			utility::PointT<float>(pos.x + 0.5f * TubeSp::WIDTH, pos.y - 0.5f * space - TubeSp::HEIGHT))  // DownBox bottom-right	
+			glm::vec3(pos.x, pos.y - 0.5f * (space + TubeSp::HEIGHT), pos.z), TubeSp::WIDTH, TubeSp::HEIGHT)  // DownBox
 	{
-		std::cout << "tube initial position\n" << 
-			"UP:\n" << 
-			"Top-let: " << pos.x - 0.5f * TubeSp::WIDTH << " " <<
-			pos.y + 0.5f * space + TubeSp::HEIGHT << "\n" <<
-			"Bottom-right: " << pos.x + 0.5f * TubeSp::WIDTH << " " <<
-			pos.y + 0.5f * space << "\n" << 
-			"down:\n" <<
-			"Top-let: " << pos.x - 0.5f * TubeSp::WIDTH << " " <<
-			pos.y - 0.5f * space << "\n" <<
-			"Bottom-right: " << pos.x + 0.5f * TubeSp::WIDTH << " " <<
-			pos.y - 0.5f * space - TubeSp::HEIGHT << "\n" << endl;
+		//std::cout << "tube initial position\n" << 
+		//	"UP:\n" << 
+		//	"Top-let: " << pos.x - 0.5f * TubeSp::WIDTH << " " <<
+		//	pos.y + 0.5f * space + TubeSp::HEIGHT << "\n" <<
+		//	"Bottom-right: " << pos.x + 0.5f * TubeSp::WIDTH << " " <<
+		//	pos.y + 0.5f * space << "\n" << 
+		//	"down:\n" <<
+		//	"Top-let: " << pos.x - 0.5f * TubeSp::WIDTH << " " <<
+		//	pos.y - 0.5f * space << "\n" <<
+		//	"Bottom-right: " << pos.x + 0.5f * TubeSp::WIDTH << " " <<
+		//	pos.y - 0.5f * space - TubeSp::HEIGHT << "\n" << endl;
 
 		glGenVertexArrays(1, &this->VAO_);
 		glBindVertexArray(this->VAO_);
@@ -108,6 +106,7 @@ public:
 	auto getUpBox() const noexcept { return this->upBox_; }
 	auto getDownBox() const noexcept { return this->downBox_; }
 
+	//**************************************************************************************
 	glm::vec3 position_;
 	utility::Collidable upBox_;
 	utility::Collidable downBox_;
