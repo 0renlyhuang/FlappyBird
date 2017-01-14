@@ -77,6 +77,12 @@
     <None Include="tube.frag">
       <Filter>shader</Filter>
     </None>
+    <None Include="t.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="t.vert">
+      <Filter>shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Library Include="dependencies\assimp\assimp.lib">

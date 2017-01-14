@@ -17,27 +17,27 @@ namespace TubeSp
 	auto deletor = [](GLfloat *p) {delete[] p; };
 	using ArrayDelete = decltype(deletor);
 	constexpr std::size_t SIZE = 3 * 6 * 2;
-	constexpr GLfloat WIDTH = 0.1f;
-	constexpr GLfloat HEIGHT = 2.0f;
+	constexpr GLfloat WIDTH = 50.0f; //0.1f;
+	constexpr GLfloat HEIGHT = 800.0f;//2.0f;
 
-	inline auto getVertices(const GLfloat space)
+	inline auto getVertices(const GLfloat halfSpace)
 	{
 		return std::unique_ptr<GLfloat, ArrayDelete>(
 			new GLfloat[SIZE]
 		{  
-			-WIDTH,  HEIGHT, 0.0f,
-			-WIDTH, space, 0.0f,
-			WIDTH, space, 0.0f,
-			WIDTH, space, 0.0f,
-			WIDTH,  HEIGHT, 0.0f,
-			-WIDTH, HEIGHT, 0.0f,
+			-WIDTH,  HEIGHT + halfSpace, 0.0f,
+			-WIDTH, halfSpace, 0.0f,
+			WIDTH, halfSpace, 0.0f,
+			WIDTH, halfSpace, 0.0f,
+			WIDTH,  HEIGHT + halfSpace, 0.0f,
+			-WIDTH, HEIGHT + halfSpace, 0.0f,
 
-			-WIDTH,  -space, 0.0f,
-			-WIDTH, -HEIGHT, 0.0f,
-			WIDTH, -HEIGHT, 0.0f,
-			WIDTH, -HEIGHT, 0.0f,
-			WIDTH,  -space, 0.0f,
-			-WIDTH, -space, 0.0f
+			-WIDTH,  -halfSpace, 0.0f,
+			-WIDTH, -HEIGHT - halfSpace, 0.0f,
+			WIDTH, -HEIGHT - halfSpace, 0.0f,
+			WIDTH, -HEIGHT - halfSpace, 0.0f,
+			WIDTH,  -halfSpace, 0.0f,
+			-WIDTH, -halfSpace, 0.0f
 		},
 		deletor);
 	}
@@ -48,12 +48,12 @@ class Tube : public DrawAble {
 public:
 	using BoxT = utility::Collidable::BoxType;
 
-	Tube(const glm::vec3 pos = { 0.0f, 0.0f, 0.0f }, const GLfloat height = 0.0f, const GLfloat space = 0.3f)
-		: position_(pos), vertices_(TubeSp::getVertices(space)),
+	Tube(const glm::vec3 pos = { 0.0f, 0.0f, 0.0f }, const GLfloat height = 0.0f, const GLfloat halfSpace = 110.0f)
+		: position_(pos), vertices_(TubeSp::getVertices(halfSpace)),
 		upBox_(BoxT::RETENCGEL,
-			glm::vec3(pos.x, pos.y + 0.5f * (space + TubeSp::HEIGHT), pos.z), TubeSp::WIDTH, TubeSp::HEIGHT), // UpBox
+			glm::vec3(pos.x, pos.y + halfSpace + 0.5f * TubeSp::HEIGHT, pos.z), 2.0f * TubeSp::WIDTH,  TubeSp::HEIGHT), // UpBox
 		downBox_(BoxT::RETENCGEL,
-			glm::vec3(pos.x, pos.y - 0.5f * (space + TubeSp::HEIGHT), pos.z), TubeSp::WIDTH, TubeSp::HEIGHT)  // DownBox
+			glm::vec3(pos.x, pos.y - halfSpace - 0.5f * TubeSp::HEIGHT, pos.z), 2.0f * TubeSp::WIDTH, TubeSp::HEIGHT)  // DownBox
 	{
 		//std::cout << "tube initial position\n" << 
 		//	"UP:\n" << 
@@ -92,6 +92,11 @@ public:
 		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(), "model"),
 			1, GL_FALSE, glm::value_ptr(model));
 
+		//********************
+		glm::mat4 projection = glm::ortho(-500.0f, 500.0f, -500.0f, 500.0f, -1.0f, 1.0f);
+		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(), "projection"),
+			1, GL_FALSE, glm::value_ptr(projection));
+
 		glBindVertexArray(this->VAO_);
 		glDrawArrays(GL_TRIANGLES, 0, TubeSp::SIZE / 3);
 		glBindVertexArray(0);
@@ -120,7 +125,7 @@ private:
 };
 
 
-const GLfloat Tube::speed_ = -2.5f;
+const GLfloat Tube::speed_ = -2500.0f;//-2.5f;
 
 
 #endif // !TUBE_H

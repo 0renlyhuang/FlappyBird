@@ -161,6 +161,8 @@
     <None Include="bird.frag" />
     <None Include="bird.vert" />
     <None Include="dependencies\assimp\assimp.dll" />
+    <None Include="t.frag" />
+    <None Include="t.vert" />
     <None Include="tube.frag" />
     <None Include="tube.vert" />
   </ItemGroup>

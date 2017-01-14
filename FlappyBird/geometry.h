@@ -40,6 +40,9 @@ namespace utility {
 		Geometry& operator=(Geometry &&) = default;
 		virtual ~Geometry() = default;
 
+		//*******************************
+		virtual PointT<float> topLeft() const noexcept = 0;
+		virtual PointT<float> bottomRight() const noexcept = 0;
 	protected:
 		glm::vec3 position() const noexcept { return this->position_; }
 		glm::vec3 position_;
@@ -91,13 +94,22 @@ namespace utility {
 			return CollideDetect(*this, rectangle);
 		}
 
+		//******************************************************************************
+		PointT<float> topLeft() const noexcept {
+			return PointT<float>(this->position().x - 0.5f * this->width_,
+				this->position().y + 0.5f * this->height_);
+		}
 
+		PointT<float> bottomRight() const noexcept {
+			return PointT<float>(this->position().x + 0.5f * this->width_,
+				this->position().y - 0.5f * this->height_);
+		}
 	private:
-		PointT<float> topLeft() const noexcept { return PointT<float>(this->position().x - 0.5f * this->width_, 
-																this->position().y + 0.5f * this->height_); }
+		//PointT<float> topLeft() const noexcept { return PointT<float>(this->position().x - 0.5f * this->width_, 
+		//														this->position().y + 0.5f * this->height_); }
 
-		PointT<float> bottomRight() const noexcept {return PointT<float>(this->position().x + 0.5f * this->width_,
-																   this->position().y - 0.5f * this->height_); }
+		//PointT<float> bottomRight() const noexcept {return PointT<float>(this->position().x + 0.5f * this->width_,
+		//														   this->position().y - 0.5f * this->height_); }
 
 		float width_;
 		float height_;

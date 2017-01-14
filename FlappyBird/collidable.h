@@ -91,10 +91,13 @@ namespace utility {
 
 			glm::vec3 &position() noexcept { return this->pBox_->position(); }
 
+			//*****************************************************************************************
+			auto pBox() { return pBox_;}
 		private:
 			std::shared_ptr<Geometry> pBox_;
 		};
-
+		//****************************************************************************
+		auto pBox() { return itor_->get()->pBox(); }
 
 	private:
 		Collidable(const RealCollidable &realCollidable);

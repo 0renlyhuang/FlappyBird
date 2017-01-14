@@ -18,19 +18,19 @@ namespace BirdSp
 	auto deletor = [](GLfloat *p) {delete[] p; };
 	using ArrayDelete = decltype(deletor);
 	constexpr  std::size_t SIZE = 3 * 6;
-	constexpr GLfloat EDGE = 0.05f;
+	constexpr GLfloat HALFEDGE = 10.0f;// 0.01f;
 
 	auto getVertices() 
 	{
 		return std::unique_ptr<GLfloat, ArrayDelete>(
 			new GLfloat[SIZE]
 		{
-			-EDGE,  EDGE, 0.0f,
-			-EDGE, -EDGE, 0.0f,
-			EDGE, -EDGE, 0.0f,
-			EDGE, -EDGE, 0.0f,
-			EDGE,  EDGE, 0.0f,
-			-EDGE, EDGE, 0.0f,
+			-HALFEDGE,  HALFEDGE, 0.0f,
+			-HALFEDGE, -HALFEDGE, 0.0f,
+			HALFEDGE, -HALFEDGE, 0.0f,
+			HALFEDGE, -HALFEDGE, 0.0f,
+			HALFEDGE,  HALFEDGE, 0.0f,
+			-HALFEDGE, HALFEDGE, 0.0f,
 		},	
 		deletor);
 	}
@@ -42,9 +42,9 @@ class Bird : public DrawAble, public utility::Collidable {
 public:
 	using BoxT = utility::Collidable::BoxType;
 
-	Bird(const glm::vec3 &pos, const GLfloat speed = -1.0f) 
+	Bird(const glm::vec3 &pos, const GLfloat speed = -1000.0f) 
 		: vertices_(BirdSp::getVertices()), speed_(speed),
-			utility::Collidable(BoxT::RETENCGEL, pos, BirdSp::EDGE, BirdSp::EDGE)
+			utility::Collidable(BoxT::RETENCGEL, pos, 2.0f * BirdSp::HALFEDGE, 2.0f * BirdSp::HALFEDGE)
 	{
 		//std::cout << "bird initial position\n" <<
 		//	"Top-let: " << pos.x - 0.5f * BirdSp::EDGE << " " << 
@@ -70,7 +70,7 @@ public:
 	}
 
 	void fly() {
-		this->speed_ = 10.0f;
+		this->speed_ = 5500.0f;
 	}
 
 	void fall(const GLfloat deltaTime) {
@@ -98,6 +98,11 @@ public:
 		// model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
 		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(), "model"),
 			1, GL_FALSE, glm::value_ptr(model));
+
+		//********************
+		glm::mat4 projection = glm::ortho(-500.0f, 500.0f, -500.0f, 500.0f, -1.0f, 1.0f);
+		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(), "projection"),
+			1, GL_FALSE, glm::value_ptr(projection));
 
 		glBindVertexArray(this->VAO_);
 		glDrawArrays(GL_TRIANGLES, 0, BirdSp::SIZE / 3);
