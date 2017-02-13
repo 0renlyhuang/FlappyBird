@@ -77,6 +77,12 @@
     <None Include="tube.frag">
       <Filter>shader</Filter>
     </None>
+    <None Include="background.vert">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="background.frag">
+      <Filter>shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Library Include="dependencies\assimp\assimp.lib">
@@ -120,12 +126,18 @@
     <ClInclude Include="collidable.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="background.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="tube.jpg">
       <Filter>资源文件</Filter>
     </Image>
-    <Image Include="birdTex.png">
+    <Image Include="bird.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="background.png">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>

@@ -7,6 +7,7 @@
 #include "gl\freeglut.h"
 #include "glm\glm.hpp"
 #include "shader.h"
+#include "background.h"
 #include "bird.h"
 #include "tube.h"
 #include "collisionWorld.h"
@@ -29,9 +30,11 @@ GLfloat lastFrame = 0.0;
 
 constexpr std::size_t tubeNum = 10;
 
+unique_ptr<Background> pBackground;
 unique_ptr<Bird> pBird;
 unique_ptr<Shader> pTubeShader;
 unique_ptr<Shader> pBirdShader;
+unique_ptr<Shader> pBackgroundShader;
 std::vector<unique_ptr<Tube>> tubes;
 
 
@@ -71,6 +74,9 @@ void init() {
 
 	utility::CollisionWorld::setUp();
 
+	pBackground = std::make_unique<Background>();
+	pBackgroundShader = std::make_unique<Shader>("background.vert", "background.frag");
+
 	pBird = std::make_unique<Bird>(glm::vec3{ 0.0f, -109.693f, 0.0f });
 	pBirdShader = std::make_unique<Shader>("bird.vert", "bird.frag");
 
@@ -93,6 +99,8 @@ void display() {
 
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	
 
 	pBirdShader->use();
 
@@ -150,6 +158,9 @@ void display() {
 		}
 
 	}
+
+	pBackgroundShader->use();
+	pBackground->draw(*pBackgroundShader);
 
  	glFlush();
 }

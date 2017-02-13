@@ -158,6 +158,8 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="background.frag" />
+    <None Include="background.vert" />
     <None Include="bird.frag" />
     <None Include="bird.vert" />
     <None Include="dependencies\assimp\assimp.dll" />
@@ -171,6 +173,7 @@
     <Library Include="dependencies\SOIL\SOIL.lib" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="background.h" />
     <ClInclude Include="bird.h" />
     <ClInclude Include="collidable.h" />
     <ClInclude Include="collisionWorld.h" />
@@ -182,7 +185,8 @@
     <ClInclude Include="tube.h" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="birdTex.png" />
+    <Image Include="background.png" />
+    <Image Include="bird.png" />
     <Image Include="tube.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
