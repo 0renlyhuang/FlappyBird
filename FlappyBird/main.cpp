@@ -67,6 +67,8 @@ int main(int argc, char **argv) {
 
 
 void init() {
+	glEnable(GL_DEPTH_TEST);
+
 	utility::CollisionWorld::setUp();
 
 	pBird = std::make_unique<Bird>(glm::vec3{ 0.0f, -109.693f, 0.0f });
@@ -97,7 +99,7 @@ void display() {
 	if (isSpaceDown) {
 		pBird->fly();
 	}
-		
+	
 	pBird->fall(deltaTime);
 	pBird->draw(*pBirdShader);
 

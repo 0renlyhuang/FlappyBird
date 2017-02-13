@@ -26,19 +26,19 @@ namespace TubeSp
 		return std::unique_ptr<GLfloat, ArrayDelete>(
 			new GLfloat[SIZE]
 		{  
-			-WIDTH,  HEIGHT + halfSpace, 0.0f,	0.05f, 7.12f,
-			-WIDTH, halfSpace, 0.0f,			0.05f, 0.12f, 
-			WIDTH, halfSpace, 0.0f,				1.05f, 0.12f,
-			WIDTH, halfSpace, 0.0f,				1.05f, 0.12f,
-			WIDTH,  HEIGHT + halfSpace, 0.0f,	1.05f, 7.12f,
-			-WIDTH, HEIGHT + halfSpace, 0.0f,	0.05f, 7.12f,
+			-WIDTH,  HEIGHT + halfSpace, 0.0f,	0.0f, 1.0f,
+			-WIDTH, halfSpace, 0.0f,			0.0f, 0.0f, 
+			WIDTH, halfSpace, 0.0f,				1.0f, 0.0f,
+			WIDTH, halfSpace, 0.0f,				1.0f, 0.0f,
+			WIDTH,  HEIGHT + halfSpace, 0.0f,	1.0f, 1.0f,
+			-WIDTH, HEIGHT + halfSpace, 0.0f,	0.0f, 1.0f,
 
-			-WIDTH,  -halfSpace, 0.0f,			0.05f, 7.12f,
-			-WIDTH, -HEIGHT - halfSpace, 0.0f,	0.05f, 0.12f,
-			WIDTH, -HEIGHT - halfSpace, 0.0f,	1.05f, 0.12f,
-			WIDTH, -HEIGHT - halfSpace, 0.0f,	1.05f, 0.12f,
-			WIDTH,  -halfSpace, 0.0f,			1.05f, 7.12f,
-			-WIDTH, -halfSpace, 0.0f,			0.05f, 7.12f
+			-WIDTH,  -halfSpace, 0.0f,			0.0f, -1.0f,
+			-WIDTH, -HEIGHT - halfSpace, 0.0f,	0.0f, 0.0f,
+			WIDTH, -HEIGHT - halfSpace, 0.0f,	1.0f, 0.0f,
+			WIDTH, -HEIGHT - halfSpace, 0.0f,	1.0f, 0.0f,
+			WIDTH,  -halfSpace, 0.0f,			1.0f, -1.0f,
+			-WIDTH, -halfSpace, 0.0f,			0.0f, -1.0f
 		},
 		deletor);
 	}
@@ -73,8 +73,8 @@ public:
 			glBindTexture(GL_TEXTURE_2D, this->texture_);
 
 			int textureWidth, textureHeight;
-			unsigned char* image = SOIL_load_image("tube.jpg", &textureWidth, &textureHeight, 0, SOIL_LOAD_RGB);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureWidth, textureHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+			unsigned char* image = SOIL_load_image("tube.png", &textureWidth, &textureHeight, 0, SOIL_LOAD_RGBA);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
 			glGenerateMipmap(GL_TEXTURE_2D);
 
 			SOIL_free_image_data(image);
@@ -118,7 +118,7 @@ public:
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture_);
-		glUniform1i(glGetUniformLocation(shader.getProgram(), "ourTexture"), 0);
+		glUniform1i(glGetUniformLocation(shader.getProgram(), "wallTex"), 0);
 
 		glBindVertexArray(this->VAO_);
 		glDrawArrays(GL_TRIANGLES, 0, TubeSp::SIZE / 3);

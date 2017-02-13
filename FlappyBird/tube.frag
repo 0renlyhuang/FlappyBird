@@ -4,10 +4,12 @@ in vec2 TexCoord;
 
 out vec4 color;
 
-uniform sampler2D ourTexture;
+uniform sampler2D wallTex;
 
 void main()
 {
-	// color = vec4(1.0f);
-	color = texture(ourTexture, TexCoord);
+	vec4 texColor = texture(wallTex, TexCoord);
+	if(texColor.a < 0.1)
+        discard;
+	color = texColor;
 }

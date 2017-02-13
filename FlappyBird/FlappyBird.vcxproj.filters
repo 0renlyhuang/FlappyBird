@@ -77,12 +77,6 @@
     <None Include="tube.frag">
       <Filter>shader</Filter>
     </None>
-    <None Include="t.frag">
-      <Filter>shader</Filter>
-    </None>
-    <None Include="t.vert">
-      <Filter>shader</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Library Include="dependencies\assimp\assimp.lib">
@@ -129,6 +123,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="tube.jpg">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="birdTex.png">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>

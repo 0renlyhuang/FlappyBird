@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <memory>
 #include "GL\glew.h"
+#include "GL\SOIL.h"
 #include "glm\glm.hpp"
 #include "glm\gtc\matrix_transform.hpp"
 #include "glm\gtc\type_ptr.hpp"
@@ -17,20 +18,20 @@ namespace BirdSp
 {
 	auto deletor = [](GLfloat *p) {delete[] p; };
 	using ArrayDelete = decltype(deletor);
-	constexpr  std::size_t SIZE = 3 * 6;
-	constexpr GLfloat HALFEDGE = 10.0f;// 0.01f;
+	constexpr  std::size_t SIZE = 5 * 6;
+	constexpr GLfloat HALFEDGE = 30.0f;//10.0f;
 
 	auto getVertices() 
 	{
 		return std::unique_ptr<GLfloat, ArrayDelete>(
 			new GLfloat[SIZE]
 		{
-			-HALFEDGE,  HALFEDGE, 0.0f,
-			-HALFEDGE, -HALFEDGE, 0.0f,
-			HALFEDGE, -HALFEDGE, 0.0f,
-			HALFEDGE, -HALFEDGE, 0.0f,
-			HALFEDGE,  HALFEDGE, 0.0f,
-			-HALFEDGE, HALFEDGE, 0.0f,
+			-HALFEDGE,  HALFEDGE, 0.0f,	 0.0f, 1.0f,
+			-HALFEDGE, -HALFEDGE, 0.0f,	 0.0f, 0.0f,
+			HALFEDGE, -HALFEDGE, 0.0f,	 1.0f, 0.0f,
+			HALFEDGE, -HALFEDGE, 0.0f,	 1.0f, 0.0f,
+			HALFEDGE,  HALFEDGE, 0.0f,	 1.0f, 1.0f,
+			-HALFEDGE, HALFEDGE, 0.0f,	 0.0f, 1.0f
 		},	
 		deletor);
 	}
@@ -44,7 +45,7 @@ public:
 
 	Bird(const glm::vec3 &pos, const GLfloat speed = -1000.0f) 
 		: vertices_(BirdSp::getVertices()), speed_(speed),
-			utility::Collidable(BoxT::RETENCGEL, pos, 2.0f * BirdSp::HALFEDGE, 2.0f * BirdSp::HALFEDGE)
+			utility::Collidable(BoxT::RETENCGEL, pos, 2.0f * (BirdSp::HALFEDGE - 5.0f), 2.0f * (BirdSp::HALFEDGE - 5.0f))
 	{
 		//std::cout << "bird initial position\n" <<
 		//	"Top-let: " << pos.x - 0.5f * BirdSp::EDGE << " " << 
@@ -52,9 +53,20 @@ public:
 		//	"Bottom-right: " << pos.x + 0.5f * BirdSp::EDGE << " " << 
 		//		pos.y - 0.5f * BirdSp::EDGE << "\n" << endl;
 
+		glGenTextures(1, &this->texture_);
+		glBindTexture(GL_TEXTURE_2D, this->texture_);
+
+		int textureWidth, textureHeight;
+		unsigned char* image = SOIL_load_image("bird.png", &textureWidth, &textureHeight, 0, SOIL_LOAD_RGBA);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+		SOIL_free_image_data(image);
+		glBindTexture(GL_TEXTURE_2D, 0);
+
+
 		glGenVertexArrays(1, &this->VAO_);
 		glBindVertexArray(this->VAO_);
-
 		GLuint VBO;
 		glGenBuffers(1, &VBO);
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -63,8 +75,10 @@ public:
 		GLfloat(&vArray)[BirdSp::SIZE] = *reinterpret_cast<GLfloat(*)[BirdSp::SIZE]>(rp);
 
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vArray), &vArray, GL_STATIC_DRAW);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), reinterpret_cast<GLvoid*>(0));
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), reinterpret_cast<GLvoid*>(0));
 		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), reinterpret_cast<GLvoid*>(3 * sizeof(GLfloat)));
+		glEnableVertexAttribArray(1);
 
 		glBindVertexArray(0);
 	}
@@ -104,6 +118,10 @@ public:
 		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(), "projection"),
 			1, GL_FALSE, glm::value_ptr(projection));
 
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texture_);
+		glUniform1i(glGetUniformLocation(shader.getProgram(), "birdTex"), 0);
+
 		glBindVertexArray(this->VAO_);
 		glDrawArrays(GL_TRIANGLES, 0, BirdSp::SIZE / 3);
 		glBindVertexArray(0);
@@ -113,6 +131,7 @@ private:
 	const std::unique_ptr <GLfloat, BirdSp::ArrayDelete> vertices_;
 	GLfloat speed_;
 	GLuint VAO_;
+	GLuint texture_;
 };
 
 #endif // !BIRD_H
