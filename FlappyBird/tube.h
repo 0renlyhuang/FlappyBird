@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <memory>
 #include "GL\glew.h"
+#include "GL\SOIL.h"
 #include "glm\glm.hpp"
 #include "glm\gtc\matrix_transform.hpp"
 #include "glm\gtc\type_ptr.hpp"
@@ -16,7 +17,7 @@ namespace TubeSp
 {
 	auto deletor = [](GLfloat *p) {delete[] p; };
 	using ArrayDelete = decltype(deletor);
-	constexpr std::size_t SIZE = 3 * 6 * 2;
+	constexpr std::size_t SIZE = /*3*/5 * 6 * 2;
 	constexpr GLfloat WIDTH = 50.0f; //0.1f;
 	constexpr GLfloat HEIGHT = 800.0f;//2.0f;
 
@@ -25,19 +26,19 @@ namespace TubeSp
 		return std::unique_ptr<GLfloat, ArrayDelete>(
 			new GLfloat[SIZE]
 		{  
-			-WIDTH,  HEIGHT + halfSpace, 0.0f,
-			-WIDTH, halfSpace, 0.0f,
-			WIDTH, halfSpace, 0.0f,
-			WIDTH, halfSpace, 0.0f,
-			WIDTH,  HEIGHT + halfSpace, 0.0f,
-			-WIDTH, HEIGHT + halfSpace, 0.0f,
+			-WIDTH,  HEIGHT + halfSpace, 0.0f,	0.05f, 7.12f,
+			-WIDTH, halfSpace, 0.0f,			0.05f, 0.12f, 
+			WIDTH, halfSpace, 0.0f,				1.05f, 0.12f,
+			WIDTH, halfSpace, 0.0f,				1.05f, 0.12f,
+			WIDTH,  HEIGHT + halfSpace, 0.0f,	1.05f, 7.12f,
+			-WIDTH, HEIGHT + halfSpace, 0.0f,	0.05f, 7.12f,
 
-			-WIDTH,  -halfSpace, 0.0f,
-			-WIDTH, -HEIGHT - halfSpace, 0.0f,
-			WIDTH, -HEIGHT - halfSpace, 0.0f,
-			WIDTH, -HEIGHT - halfSpace, 0.0f,
-			WIDTH,  -halfSpace, 0.0f,
-			-WIDTH, -halfSpace, 0.0f
+			-WIDTH,  -halfSpace, 0.0f,			0.05f, 7.12f,
+			-WIDTH, -HEIGHT - halfSpace, 0.0f,	0.05f, 0.12f,
+			WIDTH, -HEIGHT - halfSpace, 0.0f,	1.05f, 0.12f,
+			WIDTH, -HEIGHT - halfSpace, 0.0f,	1.05f, 0.12f,
+			WIDTH,  -halfSpace, 0.0f,			1.05f, 7.12f,
+			-WIDTH, -halfSpace, 0.0f,			0.05f, 7.12f
 		},
 		deletor);
 	}
@@ -66,6 +67,22 @@ public:
 		//	pos.y - 0.5f * space << "\n" <<
 		//	"Bottom-right: " << pos.x + 0.5f * TubeSp::WIDTH << " " <<
 		//	pos.y - 0.5f * space - TubeSp::HEIGHT << "\n" << endl;
+		
+		if (!this->textureLoaded_) {
+			glGenTextures(1, &this->texture_);
+			glBindTexture(GL_TEXTURE_2D, this->texture_);
+
+			int textureWidth, textureHeight;
+			unsigned char* image = SOIL_load_image("tube.jpg", &textureWidth, &textureHeight, 0, SOIL_LOAD_RGB);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureWidth, textureHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+			glGenerateMipmap(GL_TEXTURE_2D);
+
+			SOIL_free_image_data(image);
+			glBindTexture(GL_TEXTURE_2D, 0);
+
+			this->textureLoaded_ = true;
+		}
+
 
 		glGenVertexArrays(1, &this->VAO_);
 		glBindVertexArray(this->VAO_);
@@ -78,8 +95,10 @@ public:
 		GLfloat(&vArray)[TubeSp::SIZE] = *reinterpret_cast<GLfloat(*)[TubeSp::SIZE]>(rp);
 
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vArray), &vArray, GL_STATIC_DRAW);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), reinterpret_cast<GLvoid*>(0));
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, /*3*/5 * sizeof(GLfloat), reinterpret_cast<GLvoid*>(0));
 		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), reinterpret_cast<GLvoid*>(3 * sizeof(GLfloat)));
+		glEnableVertexAttribArray(1);
 
 		glBindVertexArray(0);
 	}
@@ -96,6 +115,10 @@ public:
 		glm::mat4 projection = glm::ortho(-500.0f, 500.0f, -500.0f, 500.0f, -1.0f, 1.0f);
 		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(), "projection"),
 			1, GL_FALSE, glm::value_ptr(projection));
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texture_);
+		glUniform1i(glGetUniformLocation(shader.getProgram(), "ourTexture"), 0);
 
 		glBindVertexArray(this->VAO_);
 		glDrawArrays(GL_TRIANGLES, 0, TubeSp::SIZE / 3);
@@ -122,10 +145,14 @@ private:
 	const static GLfloat speed_;
 	//utility::Collidable upBox_;
 	//utility::Collidable downBox_;
+	static GLuint texture_;
+	static bool textureLoaded_;
 };
 
 
 const GLfloat Tube::speed_ = -2500.0f;//-2.5f;
+GLuint Tube::texture_;
+bool Tube::textureLoaded_ = false;
 
 
 #endif // !TUBE_H
