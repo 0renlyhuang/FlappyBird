@@ -60,6 +60,9 @@
     <ClCompile Include="collisionDetect.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="config.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="dependencies\assimp\assimp.dll">
@@ -81,6 +84,12 @@
       <Filter>shader</Filter>
     </None>
     <None Include="background.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="button.vert">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="button.frag">
       <Filter>shader</Filter>
     </None>
   </ItemGroup>
@@ -129,6 +138,9 @@
     <ClInclude Include="background.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="button.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="tube.jpg">
@@ -138,6 +150,9 @@
       <Filter>资源文件</Filter>
     </Image>
     <Image Include="background.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="startButton.png">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>

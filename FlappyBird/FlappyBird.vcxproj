@@ -155,6 +155,7 @@
     <ClCompile Include="collidable.cpp" />
     <ClCompile Include="collisionWorld.cpp" />
     <ClCompile Include="collisionDetect.cpp" />
+    <ClCompile Include="config.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -162,6 +163,8 @@
     <None Include="background.vert" />
     <None Include="bird.frag" />
     <None Include="bird.vert" />
+    <None Include="button.frag" />
+    <None Include="button.vert" />
     <None Include="dependencies\assimp\assimp.dll" />
     <None Include="tube.frag" />
     <None Include="tube.vert" />
@@ -175,6 +178,7 @@
   <ItemGroup>
     <ClInclude Include="background.h" />
     <ClInclude Include="bird.h" />
+    <ClInclude Include="button.h" />
     <ClInclude Include="collidable.h" />
     <ClInclude Include="collisionWorld.h" />
     <ClInclude Include="drawAble.h" />
@@ -187,6 +191,7 @@
   <ItemGroup>
     <Image Include="background.png" />
     <Image Include="bird.png" />
+    <Image Include="startButton.png" />
     <Image Include="tube.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

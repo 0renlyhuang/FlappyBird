@@ -11,6 +11,7 @@
 #include "bird.h"
 #include "tube.h"
 #include "collisionWorld.h"
+#include "button.h"
 
 
 using std::cerr;
@@ -22,16 +23,25 @@ void init();
 void display();
 void spaceDown(unsigned char key, int, int);
 void spaceUp(unsigned char key, int, int);
+void mouseClick(int button, int state, int x, int y);
 
 
+extern int SCREENHEIGTH;
+extern int SCREENWIDTH;
+
+
+bool isStarted = false;
+bool startButtonDown = false;
 bool isSpaceDown = false;
 GLfloat deltaTime = 0.0;
 GLfloat lastFrame = 0.0;
 
 constexpr std::size_t tubeNum = 10;
 
+unique_ptr<Button> pStartButton;
 unique_ptr<Background> pBackground;
 unique_ptr<Bird> pBird;
+unique_ptr<Shader> pButtonShader;
 unique_ptr<Shader> pTubeShader;
 unique_ptr<Shader> pBirdShader;
 unique_ptr<Shader> pBackgroundShader;
@@ -41,7 +51,7 @@ std::vector<unique_ptr<Tube>> tubes;
 int main(int argc, char **argv) {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA);
-	glutInitWindowSize(800, 600);
+	glutInitWindowSize(SCREENWIDTH, SCREENHEIGTH);
 	glutInitContextVersion(4, 3);
 	glutInitContextProfile(GLUT_CORE_PROFILE);
 	glutCreateWindow(argv[0]);
@@ -57,7 +67,7 @@ int main(int argc, char **argv) {
 	glutIdleFunc(display);
 	glutKeyboardFunc(spaceDown);
 	glutKeyboardUpFunc(spaceUp);
-	//glutMouseFunc(mouseLeftDetetor);
+	glutMouseFunc(mouseClick);
 	//glutMotionFunc(mouseMoveDetetor);
 
 
@@ -73,6 +83,9 @@ void init() {
 	glEnable(GL_DEPTH_TEST);
 
 	utility::CollisionWorld::setUp();
+
+	pStartButton = std::make_unique<Button>("startButton.png");
+	pButtonShader = std::make_unique<Shader>("button.vert", "button.frag");
 
 	pBackground = std::make_unique<Background>();
 	pBackgroundShader = std::make_unique<Shader>("background.vert", "background.frag");
@@ -93,72 +106,75 @@ void init() {
 
 
 void display() {
-	GLfloat currFrame = 0.0001f * glutGet(GLUT_ELAPSED_TIME);
-	deltaTime = currFrame - lastFrame;
-	lastFrame = currFrame;
-
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	GLfloat currFrame = 0.0001f * glutGet(GLUT_ELAPSED_TIME);
+	deltaTime = currFrame - lastFrame;
+	lastFrame = currFrame;
 	
-
-	pBirdShader->use();
-
-	if (isSpaceDown) {
-		pBird->fly();
+	if (!isStarted) {
+		pButtonShader->use();
+		pStartButton->draw(*pButtonShader);
 	}
-	
-	pBird->fall(deltaTime);
-	pBird->draw(*pBirdShader);
+	else {
+		pBirdShader->use();
 
-
-	pTubeShader->use();
-	for (auto &ptube : tubes) {
-		static int cnt = 0;
-		++cnt;
-		ptube->shift(deltaTime);
-		ptube->draw(*pTubeShader);
-
-		auto bird_position = pBird->position();  
-		auto down_box = ptube->getDownBox().position();  
-		auto up_box = ptube->getUpBox().position();
-		// 如果碰撞
-		if (pBird->collisionDetect(ptube->getDownBox()) || pBird->collisionDetect(ptube->getUpBox())) {
-			std::cout << "collision: \n" << 
-				"Bird pos: \n" <<
-				"x: " << pBird->position().x <<
-				"\ny: " << pBird->position().y << "\n" <<
-				"top-left:\n" <<
-				"x: " << pBird->pBox()->topLeft().first << "\n" <<
-				"y: " << pBird->pBox()->topLeft().second << "\n" <<
-				"bottom-right:\n" <<
-				"x: " << pBird->pBox()->bottomRight().first << "\n" <<
-				"y: " << pBird->pBox()->bottomRight().second << "\n" <<
-				endl;
-
-			std::cout << "tube pos: \n" <<
-				"up\n" << 
-				"top-left:\n" <<
-				"x: " << ptube->getUpBox().pBox()->topLeft().first << "\n" <<
-				"y: " << ptube->getUpBox().pBox()->topLeft().second << "\n" <<
-				"bottom-right:\n" <<
-				"x: " << ptube->getUpBox().pBox()->bottomRight().first << "\n" <<
-				"y: " << ptube->getUpBox().pBox()->bottomRight().second << "\n" <<
-				"\n" <<
-				"down\n" <<
-				"top-left:\n" <<
-				"x: " << ptube->getDownBox().pBox()->topLeft().first << "\n" <<
-				"y: " << ptube->getDownBox().pBox()->topLeft().second << "\n" <<
-				"bottom-right:\n" <<
-				"x: " << ptube->getDownBox().pBox()->bottomRight().first << "\n" <<
-				"y: " << ptube->getDownBox().pBox()->bottomRight().second << "\n" <<
-				endl;
-			
-			system("Pause");
+		if (isSpaceDown) {
+			pBird->fly();
 		}
 
-	}
+		pBird->fall(deltaTime);
+		pBird->draw(*pBirdShader);
 
+
+		pTubeShader->use();
+		for (auto &ptube : tubes) {
+			static int cnt = 0;
+			++cnt;
+			ptube->shift(deltaTime);
+			ptube->draw(*pTubeShader);
+
+			auto bird_position = pBird->position();
+			auto down_box = ptube->getDownBox().position();
+			auto up_box = ptube->getUpBox().position();
+			// 如果碰撞
+			if (pBird->collisionDetect(ptube->getDownBox()) || pBird->collisionDetect(ptube->getUpBox())) {
+				std::cout << "collision: \n" <<
+					"Bird pos: \n" <<
+					"x: " << pBird->position().x <<
+					"\ny: " << pBird->position().y << "\n" <<
+					"top-left:\n" <<
+					"x: " << pBird->pBox()->topLeft().first << "\n" <<
+					"y: " << pBird->pBox()->topLeft().second << "\n" <<
+					"bottom-right:\n" <<
+					"x: " << pBird->pBox()->bottomRight().first << "\n" <<
+					"y: " << pBird->pBox()->bottomRight().second << "\n" <<
+					endl;
+
+				std::cout << "tube pos: \n" <<
+					"up\n" <<
+					"top-left:\n" <<
+					"x: " << ptube->getUpBox().pBox()->topLeft().first << "\n" <<
+					"y: " << ptube->getUpBox().pBox()->topLeft().second << "\n" <<
+					"bottom-right:\n" <<
+					"x: " << ptube->getUpBox().pBox()->bottomRight().first << "\n" <<
+					"y: " << ptube->getUpBox().pBox()->bottomRight().second << "\n" <<
+					"\n" <<
+					"down\n" <<
+					"top-left:\n" <<
+					"x: " << ptube->getDownBox().pBox()->topLeft().first << "\n" <<
+					"y: " << ptube->getDownBox().pBox()->topLeft().second << "\n" <<
+					"bottom-right:\n" <<
+					"x: " << ptube->getDownBox().pBox()->bottomRight().first << "\n" <<
+					"y: " << ptube->getDownBox().pBox()->bottomRight().second << "\n" <<
+					endl;
+
+				system("Pause");
+			}
+
+		}
+	}
 	pBackgroundShader->use();
 	pBackground->draw(*pBackgroundShader);
 
@@ -171,10 +187,33 @@ void spaceDown(unsigned char key, int, int) {
 	if (key == ' ') {
 		isSpaceDown = true;
 	}
+
+	if (key == 'a') {
+		pStartButton->down();
+	}
 }
 
 void spaceUp(unsigned char key, int, int) {
 	if (key == ' ') {
 		isSpaceDown = false;
+	}
+	if (key == 'a') {
+		pStartButton->up();
+	}
+}
+
+void mouseClick(int button, int state, int x, int y) {
+	if (button == GLUT_LEFT_BUTTON) {
+		if (state == GLUT_DOWN) {
+			cout << x << " " << y << endl;
+			if (pStartButton->cover(x, y)) { pStartButton->down(); startButtonDown = true; }
+		}
+		else if (state == GLUT_UP) {
+			if (startButtonDown) {
+				pStartButton->up();
+				startButtonDown = false;
+				isStarted = true;
+			}
+		}
 	}
 }
