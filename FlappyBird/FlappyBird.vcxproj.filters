@@ -80,16 +80,10 @@
     <None Include="tube.frag">
       <Filter>shader</Filter>
     </None>
-    <None Include="background.vert">
+    <None Include="board.vert">
       <Filter>shader</Filter>
     </None>
-    <None Include="background.frag">
-      <Filter>shader</Filter>
-    </None>
-    <None Include="button.vert">
-      <Filter>shader</Filter>
-    </None>
-    <None Include="button.frag">
+    <None Include="board.frag">
       <Filter>shader</Filter>
     </None>
   </ItemGroup>
@@ -135,10 +129,13 @@
     <ClInclude Include="collidable.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="background.h">
+    <ClInclude Include="button.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="button.h">
+    <ClInclude Include="config.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="board.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -153,6 +150,9 @@
       <Filter>资源文件</Filter>
     </Image>
     <Image Include="startButton.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="title.png">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>

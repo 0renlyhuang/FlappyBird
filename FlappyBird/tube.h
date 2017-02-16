@@ -11,6 +11,7 @@
 #include "drawAble.h"
 #include "shader.h"
 #include "collisionWorld.h"
+#include "config.h"
 
 
 namespace TubeSp
@@ -112,9 +113,9 @@ public:
 			1, GL_FALSE, glm::value_ptr(model));
 
 		//********************
-		glm::mat4 projection = glm::ortho(-500.0f, 500.0f, -500.0f, 500.0f, -1.0f, 1.0f);
+		//glm::mat4 projection = glm::ortho(-500.0f, 500.0f, -500.0f, 500.0f, -1.0f, 1.0f);
 		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(), "projection"),
-			1, GL_FALSE, glm::value_ptr(projection));
+			1, GL_FALSE, glm::value_ptr(PROJECTION));
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture_);

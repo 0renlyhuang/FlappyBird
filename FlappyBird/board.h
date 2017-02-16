@@ -1,5 +1,5 @@
-#ifndef BACKGROUND
-#define BACKGROUND
+#ifndef BOARD_H
+#define BOARD_H
 
 #include <memory>
 #include "GL\glew.h"
@@ -9,14 +9,15 @@
 #include "glm\gtc\type_ptr.hpp"
 #include "drawAble.h"
 #include "shader.h"
+#include "config.h"
 
 
-namespace BackgroundSp
+namespace BoardSp
 {
 	auto deletor = [](GLfloat *p) {delete[] p; };
 	using ArrayDelete = decltype(deletor);
 	constexpr  std::size_t SIZE = 5 * 6;
-	constexpr GLfloat HALFEDGE = 30.0f;//10.0f;
+	constexpr GLfloat HALFEDGE = 50.0f;//10.0f;
 
 	auto getVertices()
 	{
@@ -35,15 +36,17 @@ namespace BackgroundSp
 }
 
 
-class Background : public DrawAble {
+class Board : public DrawAble {
 public:
-	Background() : vertices_(BackgroundSp::getVertices()) {
+	Board(const char *tex, glm::vec3 pos = { 0.0f, 0.0f, 0.0f }, glm::vec3 scale = { 1.0f, 1.0f, 1.0f })
+		: position_(pos), scale_(scale)
+	{
 		glGenTextures(1, &this->texture_);
 		glBindTexture(GL_TEXTURE_2D, this->texture_);
 
 		int textureWidth, textureHeight;
-		unsigned char* image = SOIL_load_image("background.png", &textureWidth, &textureHeight, 0, SOIL_LOAD_RGB);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureWidth, textureHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+		unsigned char* image = SOIL_load_image(tex, &textureWidth, &textureHeight, 0, SOIL_LOAD_RGBA);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
 		SOIL_free_image_data(image);
@@ -57,7 +60,7 @@ public:
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
 		auto rp = vertices_.get();
-		GLfloat(&vArray)[BackgroundSp::SIZE] = *reinterpret_cast<GLfloat(*)[BackgroundSp::SIZE]>(rp);
+		GLfloat(&vArray)[BoardSp::SIZE] = *reinterpret_cast<GLfloat(*)[BoardSp::SIZE]>(rp);
 
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vArray), &vArray, GL_STATIC_DRAW);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), reinterpret_cast<GLvoid*>(0));
@@ -71,27 +74,32 @@ public:
 	void draw(Shader &shader) override {
 		shader.use();
 
-		glm::mat4 model;	
-		model = glm::scale(model, glm::vec3(17.0f, 17.0f, 17.0f));
+		glm::mat4 model;
+		model = glm::translate(model, this->position_);
+		model = glm::scale(model, this->scale_);
 		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(), "model"),
 			1, GL_FALSE, glm::value_ptr(model));
 
-		glm::mat4 projection = glm::ortho(-500.0f, 500.0f, -500.0f, 500.0f, -1.0f, 1.0f);
 		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(), "projection"),
-			1, GL_FALSE, glm::value_ptr(projection));
+			1, GL_FALSE, glm::value_ptr(PROJECTION));
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture_);
-		glUniform1i(glGetUniformLocation(shader.getProgram(), "backgroundTex"), 0);
+		glUniform1i(glGetUniformLocation(shader.getProgram(), "tex"), 0);
 
 		glBindVertexArray(this->VAO_);
-		glDrawArrays(GL_TRIANGLES, 0, BackgroundSp::SIZE / 3);
+		glDrawArrays(GL_TRIANGLES, 0, BoardSp::SIZE / 3);
 		glBindVertexArray(0);
 	}
-private:
-	const std::unique_ptr <GLfloat, BackgroundSp::ArrayDelete> vertices_;
+
+protected:
+	static const std::unique_ptr <GLfloat, BoardSp::ArrayDelete> vertices_;
+	const glm::vec3 position_;
+	const glm::vec3 scale_;
 	GLuint VAO_;
 	GLuint texture_;
 };
 
-#endif // !BACKGROUND
+const std::unique_ptr <GLfloat, BoardSp::ArrayDelete> Board::vertices_(BoardSp::getVertices());
+
+#endif // !BOARD_H

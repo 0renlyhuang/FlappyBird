@@ -7,11 +7,12 @@
 #include "gl\freeglut.h"
 #include "glm\glm.hpp"
 #include "shader.h"
-#include "background.h"
+#include "board.h"
 #include "bird.h"
 #include "tube.h"
 #include "collisionWorld.h"
 #include "button.h"
+#include "config.h"
 
 
 using std::cerr;
@@ -26,10 +27,6 @@ void spaceUp(unsigned char key, int, int);
 void mouseClick(int button, int state, int x, int y);
 
 
-extern int SCREENHEIGTH;
-extern int SCREENWIDTH;
-
-
 bool isStarted = false;
 bool startButtonDown = false;
 bool isSpaceDown = false;
@@ -39,7 +36,8 @@ GLfloat lastFrame = 0.0;
 constexpr std::size_t tubeNum = 10;
 
 unique_ptr<Button> pStartButton;
-unique_ptr<Background> pBackground;
+unique_ptr<Board> pBackground;
+unique_ptr<Board> pTitle;
 unique_ptr<Bird> pBird;
 unique_ptr<Shader> pButtonShader;
 unique_ptr<Shader> pTubeShader;
@@ -85,10 +83,12 @@ void init() {
 	utility::CollisionWorld::setUp();
 
 	pStartButton = std::make_unique<Button>("startButton.png");
-	pButtonShader = std::make_unique<Shader>("button.vert", "button.frag");
+	pButtonShader = std::make_unique<Shader>("board.vert", "board.frag");
 
-	pBackground = std::make_unique<Background>();
-	pBackgroundShader = std::make_unique<Shader>("background.vert", "background.frag");
+	pTitle = std::make_unique<Board>("title.png", glm::vec3{ 0.0f, 200.0f, 0.0f }, glm::vec3{ 2.2f, 2.0f, 1.0f });
+
+	pBackground = std::make_unique<Board>("background.png", glm::vec3{0.0f, 0.0f, 0.0f}, glm::vec3{10.0f, 10.0f, 1.0f});
+	pBackgroundShader = std::make_unique<Shader>("board.vert", "board.frag");
 
 	pBird = std::make_unique<Bird>(glm::vec3{ 0.0f, -109.693f, 0.0f });
 	pBirdShader = std::make_unique<Shader>("bird.vert", "bird.frag");
@@ -116,6 +116,9 @@ void display() {
 	if (!isStarted) {
 		pButtonShader->use();
 		pStartButton->draw(*pButtonShader);
+		
+		pBackgroundShader->use();
+		pTitle->draw(*pBackgroundShader);
 	}
 	else {
 		pBirdShader->use();
