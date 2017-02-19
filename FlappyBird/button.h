@@ -15,7 +15,7 @@
 
 class Button : public Board {
 public:
-	Button(const char *tex, glm::vec3 pos = { 0.0f, 0.0f, 0.0f }, glm::vec3 scale = { 1.0f, 1.0f, 1.0f }) 
+	Button(const char *tex, const glm::vec3 pos = { 0.0f, 0.0f, 0.0f }, const glm::vec3 scale = { 1.0f, 1.0f, 1.0f }) 
 		: Board(tex, pos, scale), isDown_(false) { }
 
 	void draw(Shader &shader) override {

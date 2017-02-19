@@ -38,8 +38,8 @@ namespace BoardSp
 
 class Board : public DrawAble {
 public:
-	Board(const char *tex, glm::vec3 pos = { 0.0f, 0.0f, 0.0f }, glm::vec3 scale = { 1.0f, 1.0f, 1.0f })
-		: position_(pos), scale_(scale)
+	Board(const char *tex, const glm::vec3 pos = { 0.0f, 0.0f, 0.0f }, const glm::vec3 scale = { 1.0f, 1.0f, 1.0f })
+		: Board(pos, scale)
 	{
 		glGenTextures(1, &this->texture_);
 		glBindTexture(GL_TEXTURE_2D, this->texture_);
@@ -51,24 +51,6 @@ public:
 
 		SOIL_free_image_data(image);
 		glBindTexture(GL_TEXTURE_2D, 0);
-
-
-		glGenVertexArrays(1, &this->VAO_);
-		glBindVertexArray(this->VAO_);
-		GLuint VBO;
-		glGenBuffers(1, &VBO);
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-		auto rp = vertices_.get();
-		GLfloat(&vArray)[BoardSp::SIZE] = *reinterpret_cast<GLfloat(*)[BoardSp::SIZE]>(rp);
-
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vArray), &vArray, GL_STATIC_DRAW);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), reinterpret_cast<GLvoid*>(0));
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), reinterpret_cast<GLvoid*>(3 * sizeof(GLfloat)));
-		glEnableVertexAttribArray(1);
-
-		glBindVertexArray(0);
 	}
 
 	void draw(Shader &shader) override {
@@ -93,6 +75,27 @@ public:
 	}
 
 protected:
+	Board(const glm::vec3 pos = { 0.0f, 0.0f, 0.0f }, const glm::vec3 scale = { 1.0f, 1.0f, 1.0f })
+		: position_(pos), scale_(scale)
+	{
+		glGenVertexArrays(1, &this->VAO_);
+		glBindVertexArray(this->VAO_);
+		GLuint VBO;
+		glGenBuffers(1, &VBO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+		auto rp = vertices_.get();
+		GLfloat(&vArray)[BoardSp::SIZE] = *reinterpret_cast<GLfloat(*)[BoardSp::SIZE]>(rp);
+
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vArray), &vArray, GL_STATIC_DRAW);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), reinterpret_cast<GLvoid*>(0));
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), reinterpret_cast<GLvoid*>(3 * sizeof(GLfloat)));
+		glEnableVertexAttribArray(1);
+
+		glBindVertexArray(0);
+	}
+
 	static const std::unique_ptr <GLfloat, BoardSp::ArrayDelete> vertices_;
 	const glm::vec3 position_;
 	const glm::vec3 scale_;

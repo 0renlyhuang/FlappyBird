@@ -138,6 +138,12 @@
     <ClInclude Include="board.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="displayBoard.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="scoreBoard.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="tube.jpg">

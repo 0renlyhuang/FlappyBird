@@ -110,6 +110,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>dependencies\SOIL;dependencies\assimp;dependencies\freeglut;dependencies\glew;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;assimp.lib;freeglut.lib;glew32.lib;SOIL.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <StackReserveSize>1000000</StackReserveSize>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -180,10 +181,12 @@
     <ClInclude Include="collidable.h" />
     <ClInclude Include="collisionWorld.h" />
     <ClInclude Include="config.h" />
+    <ClInclude Include="displayBoard.h" />
     <ClInclude Include="drawAble.h" />
     <ClInclude Include="geometry.h" />
     <ClInclude Include="include\SOIL.h" />
     <ClInclude Include="physic.h" />
+    <ClInclude Include="scoreBoard.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="tube.h" />
   </ItemGroup>

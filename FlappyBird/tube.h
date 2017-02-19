@@ -135,6 +135,8 @@ public:
 	auto getUpBox() const noexcept { return this->upBox_; }
 	auto getDownBox() const noexcept { return this->downBox_; }
 
+	const glm::vec3 &position() noexcept { return this->position_; }
+
 	//**************************************************************************************
 	glm::vec3 position_;
 	utility::Collidable upBox_;
@@ -151,7 +153,7 @@ private:
 };
 
 
-const GLfloat Tube::speed_ = -2500.0f;//-2.5f;
+const GLfloat Tube::speed_ = -2500.0f;//-2500.0f;//-2.5f;
 GLuint Tube::texture_;
 bool Tube::textureLoaded_ = false;
 

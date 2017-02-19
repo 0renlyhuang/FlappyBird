@@ -12,6 +12,7 @@
 #include "tube.h"
 #include "collisionWorld.h"
 #include "button.h"
+#include "scoreBoard.h"
 #include "config.h"
 
 
@@ -33,17 +34,21 @@ bool isSpaceDown = false;
 GLfloat deltaTime = 0.0;
 GLfloat lastFrame = 0.0;
 
-constexpr std::size_t tubeNum = 10;
+constexpr std::size_t tubeNum = 999;
 
 unique_ptr<Button> pStartButton;
 unique_ptr<Board> pBackground;
 unique_ptr<Board> pTitle;
 unique_ptr<Bird> pBird;
+unique_ptr<ScoreBoard> pScore;
+std::vector<unique_ptr<Tube>> tubes;
 unique_ptr<Shader> pButtonShader;
 unique_ptr<Shader> pTubeShader;
 unique_ptr<Shader> pBirdShader;
-unique_ptr<Shader> pBackgroundShader;
-std::vector<unique_ptr<Tube>> tubes;
+unique_ptr<Shader> pBoardShader;
+
+int currTube = 0;  // Index
+
 
 
 int main(int argc, char **argv) {
@@ -60,6 +65,12 @@ int main(int argc, char **argv) {
 	}
 
 	init();
+
+	for (auto &ptube : tubes) {
+		std::cout << "(" <<
+			ptube->position().x <<
+			", " << ptube->position().y << ")\n";
+	}
 
 	glutDisplayFunc(display);
 	glutIdleFunc(display);
@@ -88,7 +99,9 @@ void init() {
 	pTitle = std::make_unique<Board>("title.png", glm::vec3{ 0.0f, 200.0f, 0.0f }, glm::vec3{ 2.2f, 2.0f, 1.0f });
 
 	pBackground = std::make_unique<Board>("background.png", glm::vec3{0.0f, 0.0f, 0.0f}, glm::vec3{10.0f, 10.0f, 1.0f});
-	pBackgroundShader = std::make_unique<Shader>("board.vert", "board.frag");
+	pBoardShader = std::make_unique<Shader>("board.vert", "board.frag");
+
+	pScore = std::make_unique<ScoreBoard>(glm::vec3{ 0.0f, 400.0f, 0.0f }, glm::vec3{ 0.26f, 0.36f, 1.0f }, 0);
 
 	pBird = std::make_unique<Bird>(glm::vec3{ 0.0f, -109.693f, 0.0f });
 	pBirdShader = std::make_unique<Shader>("bird.vert", "bird.frag");
@@ -117,10 +130,14 @@ void display() {
 		pButtonShader->use();
 		pStartButton->draw(*pButtonShader);
 		
-		pBackgroundShader->use();
-		pTitle->draw(*pBackgroundShader);
+		pBoardShader->use();
+		pTitle->draw(*pBoardShader);
+		//pScore->draw(*pBoardShader);
 	}
 	else {
+		pBoardShader->use();
+		pScore->draw(*pBoardShader);
+
 		pBirdShader->use();
 
 		if (isSpaceDown) {
@@ -132,54 +149,90 @@ void display() {
 
 
 		pTubeShader->use();
+		//for (auto &ptube : tubes) {
+		//	static int cnt = 0;
+		//	++cnt;
+		//	ptube->shift(deltaTime);
+		//	ptube->draw(*pTubeShader);
+
+		//	auto bird_position = pBird->position();
+		//	auto down_box = ptube->getDownBox().position();
+		//	auto up_box = ptube->getUpBox().position();
+		//	// 如果碰撞
+		//	if (pBird->collisionDetect(ptube->getDownBox()) || pBird->collisionDetect(ptube->getUpBox())) {
+		//		std::cout << "collision: \n" <<
+		//			"Bird pos: \n" <<
+		//			"x: " << pBird->position().x <<
+		//			"\ny: " << pBird->position().y << "\n" <<
+		//			"top-left:\n" <<
+		//			"x: " << pBird->pBox()->topLeft().first << "\n" <<
+		//			"y: " << pBird->pBox()->topLeft().second << "\n" <<
+		//			"bottom-right:\n" <<
+		//			"x: " << pBird->pBox()->bottomRight().first << "\n" <<
+		//			"y: " << pBird->pBox()->bottomRight().second << "\n" <<
+		//			endl;
+
+		//		std::cout << "tube pos: \n" << 
+		//			"x: " << ptube->position().x <<
+		//			"\ny: " << ptube->position().y <<
+		//			"\nup\n" <<
+		//			"top-left:\n" <<
+		//			"x: " << ptube->getUpBox().pBox()->topLeft().first << "\n" <<
+		//			"y: " << ptube->getUpBox().pBox()->topLeft().second << "\n" <<
+		//			"bottom-right:\n" <<
+		//			"x: " << ptube->getUpBox().pBox()->bottomRight().first << "\n" <<
+		//			"y: " << ptube->getUpBox().pBox()->bottomRight().second << "\n" <<
+		//			"\n" <<
+		//			"down\n" <<
+		//			"top-left:\n" <<
+		//			"x: " << ptube->getDownBox().pBox()->topLeft().first << "\n" <<
+		//			"y: " << ptube->getDownBox().pBox()->topLeft().second << "\n" <<
+		//			"bottom-right:\n" <<
+		//			"x: " << ptube->getDownBox().pBox()->bottomRight().first << "\n" <<
+		//			"y: " << ptube->getDownBox().pBox()->bottomRight().second << "\n" <<
+		//			endl;
+
+		//		system("Pause");
+		//	}
+
+		//	// 如果通过当前的tube
+		//	if (pBird->position().x == ptube->position().x) {
+		//		pScore->setValue(pScore->getValue() + 1);
+		//	}
+
+
+		//}
+
 		for (auto &ptube : tubes) {
-			static int cnt = 0;
-			++cnt;
 			ptube->shift(deltaTime);
 			ptube->draw(*pTubeShader);
+		}
 
-			auto bird_position = pBird->position();
-			auto down_box = ptube->getDownBox().position();
-			auto up_box = ptube->getUpBox().position();
-			// 如果碰撞
-			if (pBird->collisionDetect(ptube->getDownBox()) || pBird->collisionDetect(ptube->getUpBox())) {
-				std::cout << "collision: \n" <<
-					"Bird pos: \n" <<
-					"x: " << pBird->position().x <<
-					"\ny: " << pBird->position().y << "\n" <<
-					"top-left:\n" <<
-					"x: " << pBird->pBox()->topLeft().first << "\n" <<
-					"y: " << pBird->pBox()->topLeft().second << "\n" <<
-					"bottom-right:\n" <<
-					"x: " << pBird->pBox()->bottomRight().first << "\n" <<
-					"y: " << pBird->pBox()->bottomRight().second << "\n" <<
-					endl;
+		if (currTube < tubes.size()) {
 
-				std::cout << "tube pos: \n" <<
-					"up\n" <<
-					"top-left:\n" <<
-					"x: " << ptube->getUpBox().pBox()->topLeft().first << "\n" <<
-					"y: " << ptube->getUpBox().pBox()->topLeft().second << "\n" <<
-					"bottom-right:\n" <<
-					"x: " << ptube->getUpBox().pBox()->bottomRight().first << "\n" <<
-					"y: " << ptube->getUpBox().pBox()->bottomRight().second << "\n" <<
-					"\n" <<
-					"down\n" <<
-					"top-left:\n" <<
-					"x: " << ptube->getDownBox().pBox()->topLeft().first << "\n" <<
-					"y: " << ptube->getDownBox().pBox()->topLeft().second << "\n" <<
-					"bottom-right:\n" <<
-					"x: " << ptube->getDownBox().pBox()->bottomRight().first << "\n" <<
-					"y: " << ptube->getDownBox().pBox()->bottomRight().second << "\n" <<
-					endl;
-
-				system("Pause");
+			// 如果和当前tube或者前一个tube碰撞
+			if (currTube > 0
+				? pBird->collisionDetect(tubes[currTube]->getDownBox())
+				|| pBird->collisionDetect(tubes[currTube]->getUpBox())
+				|| pBird->collisionDetect(tubes[currTube - 1]->getDownBox())
+				|| pBird->collisionDetect(tubes[currTube - 1]->getUpBox())
+				: pBird->collisionDetect(tubes[currTube]->getDownBox()) || pBird->collisionDetect(tubes[currTube]->getUpBox())) {
+				//cout << "\nCollide\n";
+				// system("Pause");
 			}
 
+			// 如果通过当前的tube
+			if (pBird->position().x > tubes[currTube]->position().x) {
+				pScore->setValue(pScore->getValue() + 1);
+				++currTube;
+			}
 		}
+
 	}
-	pBackgroundShader->use();
-	pBackground->draw(*pBackgroundShader);
+
+
+	pBoardShader->use();
+	pBackground->draw(*pBoardShader);
 
  	glFlush();
 }
@@ -192,7 +245,12 @@ void spaceDown(unsigned char key, int, int) {
 	}
 
 	if (key == 'a') {
-		pStartButton->down();
+		for (auto &ptube : tubes) {
+			std::cout << "(" <<
+				ptube->position().x <<
+				", " << ptube->position().y << ")\n";
+			}
+ 		int a = 1;
 	}
 }
 
@@ -201,7 +259,7 @@ void spaceUp(unsigned char key, int, int) {
 		isSpaceDown = false;
 	}
 	if (key == 'a') {
-		pStartButton->up();
+		// pStartButton->up();
 	}
 }
 
