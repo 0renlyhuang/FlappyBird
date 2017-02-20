@@ -97,7 +97,7 @@ protected:
 	}
 
 	static const std::unique_ptr <GLfloat, BoardSp::ArrayDelete> vertices_;
-	const glm::vec3 position_;
+	glm::vec3 position_;
 	const glm::vec3 scale_;
 	GLuint VAO_;
 	GLuint texture_;

@@ -44,7 +44,7 @@ unique_ptr<ScoreBoard> pScore;
 std::vector<unique_ptr<Tube>> tubes;
 unique_ptr<Shader> pButtonShader;
 unique_ptr<Shader> pTubeShader;
-unique_ptr<Shader> pBirdShader;
+// unique_ptr<Shader> pBirdShader;
 unique_ptr<Shader> pBoardShader;
 
 int currTube = 0;  // Index
@@ -104,13 +104,13 @@ void init() {
 	pScore = std::make_unique<ScoreBoard>(glm::vec3{ 0.0f, 400.0f, 0.0f }, glm::vec3{ 0.26f, 0.36f, 1.0f }, 0);
 
 	pBird = std::make_unique<Bird>(glm::vec3{ 0.0f, -109.693f, 0.0f });
-	pBirdShader = std::make_unique<Shader>("bird.vert", "bird.frag");
+	// pBirdShader = std::make_unique<Shader>("bird.vert", "bird.frag");
 
 	std::default_random_engine e;
 
 	for (int i = 0; i < tubeNum; ++i) {
 		tubes.emplace_back(std::make_unique<Tube>(
-			glm::vec3(500.0f + 300.0f * static_cast<float>(i), (static_cast<int>(e() % 9) - 4) * 80.0f, 0.0f/*30.0f, -160.0f, 0.0f*/)
+			glm::vec3(500.0f + 400.0f * static_cast<float>(i), (static_cast<int>(e() % 6) - 3) * 80.0f, 0.0f/*30.0f, -160.0f, 0.0f*/)
 			));
 	}
 	pTubeShader = std::make_unique<Shader>("tube.vert", "tube.frag");
@@ -132,20 +132,27 @@ void display() {
 		
 		pBoardShader->use();
 		pTitle->draw(*pBoardShader);
-		//pScore->draw(*pBoardShader);
 	}
 	else {
 		pBoardShader->use();
 		pScore->draw(*pBoardShader);
 
-		pBirdShader->use();
+
+		//pBirdShader->use();
+		pBoardShader->use();
 
 		if (isSpaceDown) {
 			pBird->fly();
 		}
 
 		pBird->fall(deltaTime);
-		pBird->draw(*pBirdShader);
+		
+		static int flutterRate = 0;
+		++flutterRate;
+		if (flutterRate % 10 == 0)
+			pBird->flutter();
+		
+		pBird->draw(*pBoardShader);
 
 
 		pTubeShader->use();
@@ -217,7 +224,7 @@ void display() {
 				|| pBird->collisionDetect(tubes[currTube - 1]->getDownBox())
 				|| pBird->collisionDetect(tubes[currTube - 1]->getUpBox())
 				: pBird->collisionDetect(tubes[currTube]->getDownBox()) || pBird->collisionDetect(tubes[currTube]->getUpBox())) {
-				//cout << "\nCollide\n";
+				cout << "\nCollide\n";
 				// system("Pause");
 			}
 

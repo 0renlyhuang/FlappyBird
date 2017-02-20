@@ -194,6 +194,10 @@
     <Image Include="background.png" />
     <Image Include="bird.png" />
     <Image Include="startButton.png" />
+    <Image Include="texture\birdDown.png" />
+    <Image Include="texture\birdFlutterUpFly.png" />
+    <Image Include="texture\birdFlutterUpNormal.png" />
+    <Image Include="texture\birdUp.png" />
     <Image Include="title.png" />
     <Image Include="tube.jpg" />
   </ItemGroup>

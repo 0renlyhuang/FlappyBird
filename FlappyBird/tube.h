@@ -50,7 +50,7 @@ class Tube : public DrawAble {
 public:
 	using BoxT = utility::Collidable::BoxType;
 
-	Tube(const glm::vec3 pos = { 0.0f, 0.0f, 0.0f }, const GLfloat height = 0.0f, const GLfloat halfSpace = 110.0f)
+	Tube(const glm::vec3 pos = { 0.0f, 0.0f, 0.0f }, const GLfloat height = 0.0f, const GLfloat halfSpace = /*110.0f*/130.0f)
 		: position_(pos), vertices_(TubeSp::getVertices(halfSpace)),
 		upBox_(BoxT::RETENCGEL,
 			glm::vec3(pos.x, pos.y + halfSpace + 0.5f * TubeSp::HEIGHT, pos.z), 2.0f * TubeSp::WIDTH,  TubeSp::HEIGHT), // UpBox
