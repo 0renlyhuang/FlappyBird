@@ -161,12 +161,6 @@
     <Image Include="title.png">
       <Filter>资源文件</Filter>
     </Image>
-    <Image Include="texture\birdDown.png">
-      <Filter>资源文件</Filter>
-    </Image>
-    <Image Include="texture\birdUp.png">
-      <Filter>资源文件</Filter>
-    </Image>
     <Image Include="texture\birdFlutterUpFly.png">
       <Filter>资源文件</Filter>
     </Image>

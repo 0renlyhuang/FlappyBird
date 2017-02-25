@@ -29,7 +29,9 @@ void mouseClick(int button, int state, int x, int y);
 
 
 bool isStarted = false;
+bool isOver = false;
 bool startButtonDown = false;
+bool OKButtonDown = false;
 bool isSpaceDown = false;
 GLfloat deltaTime = 0.0;
 GLfloat lastFrame = 0.0;
@@ -37,8 +39,11 @@ GLfloat lastFrame = 0.0;
 constexpr std::size_t tubeNum = 999;
 
 unique_ptr<Button> pStartButton;
+unique_ptr<Button> pOKButton;
 unique_ptr<Board> pBackground;
 unique_ptr<Board> pTitle;
+unique_ptr<Board> pGameOver;
+//unique_ptr<DisplayBoard> pFlashBoard;
 unique_ptr<Bird> pBird;
 unique_ptr<ScoreBoard> pScore;
 std::vector<unique_ptr<Tube>> tubes;
@@ -48,6 +53,7 @@ unique_ptr<Shader> pTubeShader;
 unique_ptr<Shader> pBoardShader;
 
 int currTube = 0;  // Index
+enum {EMPTY = 0, WHITE, BLACK};
 
 
 
@@ -94,11 +100,19 @@ void init() {
 	utility::CollisionWorld::setUp();
 
 	pStartButton = std::make_unique<Button>("startButton.png");
+	pOKButton = std::make_unique<Button>("texture//OKButton.png", glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 1.41f, 0.5f, 1.0f });
 	pButtonShader = std::make_unique<Shader>("board.vert", "board.frag");
 
 	pTitle = std::make_unique<Board>("title.png", glm::vec3{ 0.0f, 200.0f, 0.0f }, glm::vec3{ 2.2f, 2.0f, 1.0f });
+	pGameOver = std::make_unique<Board>("texture//gameOver.png", glm::vec3{ 0.0f, 250.0f, 0.0f }, glm::vec3{ 4.0f, 4.0f, 1.0f });
 
 	pBackground = std::make_unique<Board>("background.png", glm::vec3{0.0f, 0.0f, 0.0f}, glm::vec3{10.0f, 10.0f, 1.0f});
+	
+	//pFlashBoard = std::make_unique<DisplayBoard>(
+	//	std::vector<const char*>{ "texture//empty.png", "texture//white.png", "texture//black.png" },
+	//	glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 10.0f, 10.0f, 1.0f }
+	//);
+	
 	pBoardShader = std::make_unique<Shader>("board.vert", "board.frag");
 
 	pScore = std::make_unique<ScoreBoard>(glm::vec3{ 0.0f, 400.0f, 0.0f }, glm::vec3{ 0.26f, 0.36f, 1.0f }, 0);
@@ -117,6 +131,19 @@ void init() {
 }
 
 
+void reInit() {
+	pBird = std::make_unique<Bird>(glm::vec3{ 0.0f, -109.693f, 0.0f });
+	std::default_random_engine e;
+	tubes.clear();
+	for (int i = 0; i < tubeNum; ++i) {
+		tubes.emplace_back(std::make_unique<Tube>(
+			glm::vec3(500.0f + 400.0f * static_cast<float>(i), (static_cast<int>(e() % 6) - 3) * 80.0f, 0.0f/*30.0f, -160.0f, 0.0f*/)
+			));
+	}
+	currTube = 0;
+}
+
+
 
 void display() {
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -132,6 +159,33 @@ void display() {
 		
 		pBoardShader->use();
 		pTitle->draw(*pBoardShader);
+		
+		if (isOver) {
+			isOver = false;
+			reInit();
+		}
+	}
+	else if (isOver) {
+		//static int flashWhiteHold = 0;
+		//++flashWhiteHold;
+		//if (flashWhiteHold % 20 < 10) {
+		//	pFlashBoard->setTexture(WHITE);
+		//}
+		//else {
+		//	static int flashBlackHold = 0;
+		//	--flashWhiteHold;
+		//	++flashBlackHold;
+		//	pFlashBoard->setTexture(BLACK);
+		//	if (flashBlackHold % 10 == 0) { pFlashBoard->setTexture(EMPTY); isOver = false; }
+		//}
+		//pBoardShader->use();
+		//pFlashBoard->draw(*pBoardShader);
+	
+		pBoardShader->use();
+		pGameOver->draw(*pBoardShader);
+		pButtonShader->use();
+		pOKButton->draw(*pButtonShader);
+		// reInit(); 
 	}
 	else {
 		pBoardShader->use();
@@ -226,6 +280,7 @@ void display() {
 				: pBird->collisionDetect(tubes[currTube]->getDownBox()) || pBird->collisionDetect(tubes[currTube]->getUpBox())) {
 				cout << "\nCollide\n";
 				// system("Pause");
+				isOver = true;
 			}
 
 			// 如果通过当前的tube
@@ -274,13 +329,23 @@ void mouseClick(int button, int state, int x, int y) {
 	if (button == GLUT_LEFT_BUTTON) {
 		if (state == GLUT_DOWN) {
 			cout << x << " " << y << endl;
-			if (pStartButton->cover(x, y)) { pStartButton->down(); startButtonDown = true; }
+			if (!isStarted && pStartButton->cover(x, y)) { pStartButton->down(); startButtonDown = true; }
+			if (isOver && pOKButton->cover(x, y)) { 
+				pOKButton->down(); 
+				OKButtonDown = true; 
+			}
 		}
 		else if (state == GLUT_UP) {
-			if (startButtonDown) {
+			if (!isStarted && startButtonDown) {
 				pStartButton->up();
 				startButtonDown = false;
 				isStarted = true;
+			}
+			if (isOver && OKButtonDown) {
+				pOKButton->up();
+				OKButtonDown = false;
+				// isOver = false;
+				isStarted = false;
 			}
 		}
 	}
