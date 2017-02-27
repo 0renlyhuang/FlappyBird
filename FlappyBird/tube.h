@@ -74,7 +74,7 @@ public:
 			glBindTexture(GL_TEXTURE_2D, this->texture_);
 
 			int textureWidth, textureHeight;
-			unsigned char* image = SOIL_load_image("tube.png", &textureWidth, &textureHeight, 0, SOIL_LOAD_RGBA);
+			unsigned char* image = SOIL_load_image("texture//tube.png", &textureWidth, &textureHeight, 0, SOIL_LOAD_RGBA);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
 			glGenerateMipmap(GL_TEXTURE_2D);
 

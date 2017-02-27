@@ -4,3 +4,4 @@
  int SCREENWIDTH = 800;
 
 glm::mat4 PROJECTION = glm::ortho(-500.0f, 500.0f, -500.0f, 500.0f, -1.0f, 1.0f);
+

@@ -6,6 +6,7 @@
 #include "gl\glew.h"
 #include "gl\freeglut.h"
 #include "glm\glm.hpp"
+#include <mmsystem.h>
 #include "shader.h"
 #include "board.h"
 #include "bird.h"
@@ -54,7 +55,7 @@ unique_ptr<Shader> pBoardShader;
 
 int currTube = 0;  // Index
 enum {EMPTY = 0, WHITE, BLACK};
-
+static bool wingSound;
 
 
 int main(int argc, char **argv) {
@@ -99,14 +100,14 @@ void init() {
 
 	utility::CollisionWorld::setUp();
 
-	pStartButton = std::make_unique<Button>("startButton.png");
+	pStartButton = std::make_unique<Button>("texture//startButton.png");
 	pOKButton = std::make_unique<Button>("texture//OKButton.png", glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 1.41f, 0.5f, 1.0f });
 	pButtonShader = std::make_unique<Shader>("board.vert", "board.frag");
 
-	pTitle = std::make_unique<Board>("title.png", glm::vec3{ 0.0f, 200.0f, 0.0f }, glm::vec3{ 2.2f, 2.0f, 1.0f });
+	pTitle = std::make_unique<Board>("texture//title.png", glm::vec3{ 0.0f, 200.0f, 0.0f }, glm::vec3{ 2.2f, 2.0f, 1.0f });
 	pGameOver = std::make_unique<Board>("texture//gameOver.png", glm::vec3{ 0.0f, 250.0f, 0.0f }, glm::vec3{ 4.0f, 4.0f, 1.0f });
 
-	pBackground = std::make_unique<Board>("background.png", glm::vec3{0.0f, 0.0f, 0.0f}, glm::vec3{10.0f, 10.0f, 1.0f});
+	pBackground = std::make_unique<Board>("texture//background.png", glm::vec3{0.0f, 0.0f, 0.0f}, glm::vec3{10.0f, 10.0f, 1.0f});
 	
 	//pFlashBoard = std::make_unique<DisplayBoard>(
 	//	std::vector<const char*>{ "texture//empty.png", "texture//white.png", "texture//black.png" },
@@ -141,6 +142,7 @@ void reInit() {
 			));
 	}
 	currTube = 0;
+	pScore->setValue(0);
 }
 
 
@@ -166,21 +168,6 @@ void display() {
 		}
 	}
 	else if (isOver) {
-		//static int flashWhiteHold = 0;
-		//++flashWhiteHold;
-		//if (flashWhiteHold % 20 < 10) {
-		//	pFlashBoard->setTexture(WHITE);
-		//}
-		//else {
-		//	static int flashBlackHold = 0;
-		//	--flashWhiteHold;
-		//	++flashBlackHold;
-		//	pFlashBoard->setTexture(BLACK);
-		//	if (flashBlackHold % 10 == 0) { pFlashBoard->setTexture(EMPTY); isOver = false; }
-		//}
-		//pBoardShader->use();
-		//pFlashBoard->draw(*pBoardShader);
-	
 		pBoardShader->use();
 		pGameOver->draw(*pBoardShader);
 		pButtonShader->use();
@@ -195,7 +182,7 @@ void display() {
 		//pBirdShader->use();
 		pBoardShader->use();
 
-		if (isSpaceDown) {
+		if (isSpaceDown) {	
 			pBird->fly();
 		}
 
@@ -287,6 +274,8 @@ void display() {
 			if (pBird->position().x > tubes[currTube]->position().x) {
 				pScore->setValue(pScore->getValue() + 1);
 				++currTube;
+				PlaySoundA("sounds//point.wav", NULL, SND_ASYNC | SND_FILENAME);
+				//PlaySound(NULL, NULL, 0);
 			}
 		}
 
@@ -300,10 +289,17 @@ void display() {
 }
 
 
-
+#include  <future>
 void spaceDown(unsigned char key, int, int) {
 	if (key == ' ') {
+		if (isStarted) {
+			PlaySoundA("sounds//wing.wav", NULL, SND_ASYNC | SND_FILENAME | SND_NOSTOP);
+		}
 		isSpaceDown = true;
+		// PlaySoundA("sounds//sfx_wing.wav", NULL, SND_ASYNC | SND_FILENAME | SND_NOSTOP);
+		// mciSendStringA("open sounds//sfx_wing.wav", NULL, 0, 0);
+		//std::async([]() { mciSendStringA("play sounds//sfx_wing.wav", NULL, 0, 0); });
+		//wingSound = true;
 	}
 
 	if (key == 'a') {
