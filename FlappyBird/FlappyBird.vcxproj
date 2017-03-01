@@ -108,8 +108,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>dependencies\SOIL;dependencies\assimp;dependencies\freeglut;dependencies\glew;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;assimp.lib;freeglut.lib;glew32.lib;SOIL.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>dependencies\freealut;dependencies\OpenAL;dependencies\SOIL;dependencies\assimp;dependencies\freeglut;dependencies\glew;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;assimp.lib;freeglut.lib;glew32.lib;SOIL.lib;alut.lib;OpenAL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <StackReserveSize>1000000</StackReserveSize>
     </Link>
   </ItemDefinitionGroup>
@@ -188,6 +188,7 @@
     <ClInclude Include="physic.h" />
     <ClInclude Include="scoreBoard.h" />
     <ClInclude Include="shader.h" />
+    <ClInclude Include="SoundManager.h" />
     <ClInclude Include="tube.h" />
   </ItemGroup>
   <ItemGroup>

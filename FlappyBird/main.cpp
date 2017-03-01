@@ -6,12 +6,12 @@
 #include "gl\glew.h"
 #include "gl\freeglut.h"
 #include "glm\glm.hpp"
-#include <mmsystem.h>
 #include "shader.h"
 #include "board.h"
 #include "bird.h"
 #include "tube.h"
 #include "collisionWorld.h"
+#include "SoundManager.h"
 #include "button.h"
 #include "scoreBoard.h"
 #include "config.h"
@@ -55,7 +55,10 @@ unique_ptr<Shader> pBoardShader;
 
 int currTube = 0;  // Index
 enum {EMPTY = 0, WHITE, BLACK};
-static bool wingSound;
+std::size_t wingSound;
+std::size_t pointSound;
+std::size_t dieSound;
+std::size_t hitSound;
 
 
 int main(int argc, char **argv) {
@@ -70,6 +73,9 @@ int main(int argc, char **argv) {
 		cerr << "Unable to initialize GLEW... exiting" << endl;
 		std::exit(EXIT_FAILURE);
 	}
+
+	// 设置音效管理
+	SoundManager::setUp(argc, argv);
 
 	init();
 
@@ -87,9 +93,6 @@ int main(int argc, char **argv) {
 	//glutMotionFunc(mouseMoveDetetor);
 
 
-
-	// 3.进入事件循环体系
-	// 一个无限循环
 	glutMainLoop();
 }
 
@@ -129,6 +132,12 @@ void init() {
 			));
 	}
 	pTubeShader = std::make_unique<Shader>("tube.vert", "tube.frag");
+
+	auto pSoundManager = SoundManager::instance();
+	wingSound = pSoundManager->load("sounds//wing.wav");
+	pointSound = pSoundManager->load("sounds//point.wav");
+	dieSound = pSoundManager->load("sounds//die.wav");
+	hitSound = pSoundManager->load("sounds//hit.wav");
 }
 
 
@@ -172,14 +181,12 @@ void display() {
 		pGameOver->draw(*pBoardShader);
 		pButtonShader->use();
 		pOKButton->draw(*pButtonShader);
-		// reInit(); 
 	}
 	else {
 		pBoardShader->use();
 		pScore->draw(*pBoardShader);
 
 
-		//pBirdShader->use();
 		pBoardShader->use();
 
 		if (isSpaceDown) {	
@@ -197,59 +204,6 @@ void display() {
 
 
 		pTubeShader->use();
-		//for (auto &ptube : tubes) {
-		//	static int cnt = 0;
-		//	++cnt;
-		//	ptube->shift(deltaTime);
-		//	ptube->draw(*pTubeShader);
-
-		//	auto bird_position = pBird->position();
-		//	auto down_box = ptube->getDownBox().position();
-		//	auto up_box = ptube->getUpBox().position();
-		//	// 如果碰撞
-		//	if (pBird->collisionDetect(ptube->getDownBox()) || pBird->collisionDetect(ptube->getUpBox())) {
-		//		std::cout << "collision: \n" <<
-		//			"Bird pos: \n" <<
-		//			"x: " << pBird->position().x <<
-		//			"\ny: " << pBird->position().y << "\n" <<
-		//			"top-left:\n" <<
-		//			"x: " << pBird->pBox()->topLeft().first << "\n" <<
-		//			"y: " << pBird->pBox()->topLeft().second << "\n" <<
-		//			"bottom-right:\n" <<
-		//			"x: " << pBird->pBox()->bottomRight().first << "\n" <<
-		//			"y: " << pBird->pBox()->bottomRight().second << "\n" <<
-		//			endl;
-
-		//		std::cout << "tube pos: \n" << 
-		//			"x: " << ptube->position().x <<
-		//			"\ny: " << ptube->position().y <<
-		//			"\nup\n" <<
-		//			"top-left:\n" <<
-		//			"x: " << ptube->getUpBox().pBox()->topLeft().first << "\n" <<
-		//			"y: " << ptube->getUpBox().pBox()->topLeft().second << "\n" <<
-		//			"bottom-right:\n" <<
-		//			"x: " << ptube->getUpBox().pBox()->bottomRight().first << "\n" <<
-		//			"y: " << ptube->getUpBox().pBox()->bottomRight().second << "\n" <<
-		//			"\n" <<
-		//			"down\n" <<
-		//			"top-left:\n" <<
-		//			"x: " << ptube->getDownBox().pBox()->topLeft().first << "\n" <<
-		//			"y: " << ptube->getDownBox().pBox()->topLeft().second << "\n" <<
-		//			"bottom-right:\n" <<
-		//			"x: " << ptube->getDownBox().pBox()->bottomRight().first << "\n" <<
-		//			"y: " << ptube->getDownBox().pBox()->bottomRight().second << "\n" <<
-		//			endl;
-
-		//		system("Pause");
-		//	}
-
-		//	// 如果通过当前的tube
-		//	if (pBird->position().x == ptube->position().x) {
-		//		pScore->setValue(pScore->getValue() + 1);
-		//	}
-
-
-		//}
 
 		for (auto &ptube : tubes) {
 			ptube->shift(deltaTime);
@@ -267,6 +221,8 @@ void display() {
 				: pBird->collisionDetect(tubes[currTube]->getDownBox()) || pBird->collisionDetect(tubes[currTube]->getUpBox())) {
 				cout << "\nCollide\n";
 				// system("Pause");
+				SoundManager::instance()->play(hitSound);
+				SoundManager::instance()->play(dieSound);
 				isOver = true;
 			}
 
@@ -274,8 +230,7 @@ void display() {
 			if (pBird->position().x > tubes[currTube]->position().x) {
 				pScore->setValue(pScore->getValue() + 1);
 				++currTube;
-				PlaySoundA("sounds//point.wav", NULL, SND_ASYNC | SND_FILENAME);
-				//PlaySound(NULL, NULL, 0);
+				SoundManager::instance()->play(pointSound);
 			}
 		}
 
@@ -292,14 +247,10 @@ void display() {
 #include  <future>
 void spaceDown(unsigned char key, int, int) {
 	if (key == ' ') {
-		if (isStarted) {
-			PlaySoundA("sounds//wing.wav", NULL, SND_ASYNC | SND_FILENAME | SND_NOSTOP);
+		if (isStarted && !isOver) {
+			SoundManager::instance()->play(wingSound);		
 		}
 		isSpaceDown = true;
-		// PlaySoundA("sounds//sfx_wing.wav", NULL, SND_ASYNC | SND_FILENAME | SND_NOSTOP);
-		// mciSendStringA("open sounds//sfx_wing.wav", NULL, 0, 0);
-		//std::async([]() { mciSendStringA("play sounds//sfx_wing.wav", NULL, 0, 0); });
-		//wingSound = true;
 	}
 
 	if (key == 'a') {
