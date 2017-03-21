@@ -59,6 +59,7 @@ std::size_t wingSound;
 std::size_t pointSound;
 std::size_t dieSound;
 std::size_t hitSound;
+std::size_t clickSound;
 
 
 int main(int argc, char **argv) {
@@ -138,6 +139,7 @@ void init() {
 	pointSound = pSoundManager->load("sounds//point.wav");
 	dieSound = pSoundManager->load("sounds//die.wav");
 	hitSound = pSoundManager->load("sounds//hit.wav");
+	clickSound = pSoundManager->load("sounds//buttonClick.wav");
 }
 
 
@@ -276,10 +278,14 @@ void mouseClick(int button, int state, int x, int y) {
 	if (button == GLUT_LEFT_BUTTON) {
 		if (state == GLUT_DOWN) {
 			cout << x << " " << y << endl;
-			if (!isStarted && pStartButton->cover(x, y)) { pStartButton->down(); startButtonDown = true; }
+			if (!isStarted && pStartButton->cover(x, y)) { 
+				pStartButton->down(); startButtonDown = true; 
+				SoundManager::instance()->play(clickSound);
+			}
 			if (isOver && pOKButton->cover(x, y)) { 
 				pOKButton->down(); 
 				OKButtonDown = true; 
+				SoundManager::instance()->play(clickSound);
 			}
 		}
 		else if (state == GLUT_UP) {
@@ -292,7 +298,7 @@ void mouseClick(int button, int state, int x, int y) {
 				pOKButton->up();
 				OKButtonDown = false;
 				// isOver = false;
-				isStarted = false;
+				isStarted = false;			
 			}
 		}
 	}
