@@ -17,6 +17,7 @@ using std::cout;
 using std::endl;
 using std::ifstream;
 
+// 对OpenGL创建着色器的一个封装
 class Shader {
 public:
 	Shader(const char *vertexPath, const char *fragmentPath) {

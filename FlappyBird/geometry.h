@@ -19,6 +19,8 @@ namespace utility {
 	bool CollideDetect(const Rectangle &r1, const Rectangle &r2);
 
 
+	// 表示几何，用于实现由几何类型确定的碰撞检测算法
+	// 观察者模式（双分发）
 	// Double dispatch
 	class Geometry {
 	public:
@@ -40,10 +42,9 @@ namespace utility {
 		Geometry& operator=(Geometry &&) = default;
 		virtual ~Geometry() = default;
 
-		//*******************************
+	protected:
 		virtual PointT<float> topLeft() const noexcept = 0;
 		virtual PointT<float> bottomRight() const noexcept = 0;
-	protected:
 		glm::vec3 position() const noexcept { return this->position_; }
 		glm::vec3 position_;
 	};
@@ -94,7 +95,8 @@ namespace utility {
 			return CollideDetect(*this, rectangle);
 		}
 
-		//******************************************************************************
+
+	private:
 		PointT<float> topLeft() const noexcept {
 			return PointT<float>(this->position().x - 0.5f * this->width_,
 				this->position().y + 0.5f * this->height_);
@@ -104,12 +106,6 @@ namespace utility {
 			return PointT<float>(this->position().x + 0.5f * this->width_,
 				this->position().y - 0.5f * this->height_);
 		}
-	private:
-		//PointT<float> topLeft() const noexcept { return PointT<float>(this->position().x - 0.5f * this->width_, 
-		//														this->position().y + 0.5f * this->height_); }
-
-		//PointT<float> bottomRight() const noexcept {return PointT<float>(this->position().x + 0.5f * this->width_,
-		//														   this->position().y - 0.5f * this->height_); }
 
 		float width_;
 		float height_;

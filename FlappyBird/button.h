@@ -43,6 +43,7 @@ public:
 
 	void up() { this->isDown_ = false;  }
 
+	// 判断鼠标是否在按钮上
 	bool cover(const int mouseX, const int mouseY) {
 		glPushMatrix();
 		glTranslatef(this->position_.x, this->position_.y, this->position_.z);

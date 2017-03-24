@@ -13,7 +13,7 @@ namespace utility {
 	class CollisionException {};
 
 	// Singleton
-	// 碰撞世界
+	// 表示碰撞世界，用于维护所有可碰撞物体
 	class CollisionWorld {
 	public:
 		// 开启碰撞检测

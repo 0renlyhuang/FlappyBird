@@ -46,6 +46,7 @@ namespace TubeSp
 }
 
 
+// 用于表示油管的类
 class Tube : public DrawAble {
 public:
 	using BoxT = utility::Collidable::BoxType;
@@ -57,17 +58,6 @@ public:
 		downBox_(BoxT::RETENCGEL,
 			glm::vec3(pos.x, pos.y - halfSpace - 0.5f * TubeSp::HEIGHT, pos.z), 2.0f * TubeSp::WIDTH, TubeSp::HEIGHT)  // DownBox
 	{
-		//std::cout << "tube initial position\n" << 
-		//	"UP:\n" << 
-		//	"Top-let: " << pos.x - 0.5f * TubeSp::WIDTH << " " <<
-		//	pos.y + 0.5f * space + TubeSp::HEIGHT << "\n" <<
-		//	"Bottom-right: " << pos.x + 0.5f * TubeSp::WIDTH << " " <<
-		//	pos.y + 0.5f * space << "\n" << 
-		//	"down:\n" <<
-		//	"Top-let: " << pos.x - 0.5f * TubeSp::WIDTH << " " <<
-		//	pos.y - 0.5f * space << "\n" <<
-		//	"Bottom-right: " << pos.x + 0.5f * TubeSp::WIDTH << " " <<
-		//	pos.y - 0.5f * space - TubeSp::HEIGHT << "\n" << endl;
 		
 		if (!this->textureLoaded_) {
 			glGenTextures(1, &this->texture_);
@@ -112,8 +102,6 @@ public:
 		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(), "model"),
 			1, GL_FALSE, glm::value_ptr(model));
 
-		//********************
-		//glm::mat4 projection = glm::ortho(-500.0f, 500.0f, -500.0f, 500.0f, -1.0f, 1.0f);
 		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(), "projection"),
 			1, GL_FALSE, glm::value_ptr(PROJECTION));
 
@@ -137,19 +125,15 @@ public:
 
 	const glm::vec3 &position() noexcept { return this->position_; }
 
-	//**************************************************************************************
-	glm::vec3 position_;
-	utility::Collidable upBox_;
-	utility::Collidable downBox_;
 private:
 	const std::unique_ptr <GLfloat, TubeSp::ArrayDelete> vertices_;
 	GLuint VAO_;
-	//glm::vec3 position_;
 	const static GLfloat speed_;
-	//utility::Collidable upBox_;
-	//utility::Collidable downBox_;
 	static GLuint texture_;
 	static bool textureLoaded_;
+	glm::vec3 position_;
+	utility::Collidable upBox_;
+	utility::Collidable downBox_;
 };
 
 

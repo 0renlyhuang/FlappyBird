@@ -8,7 +8,7 @@
 #include "OpenAL\al.h"
 #include "OpenAL\alc.h"
 
-
+// 音频管理类
 class SoundManager {
 public:
 	class SoundException {};
@@ -23,6 +23,7 @@ public:
 	}
 
 	// Singleton
+	// 单例模式
 	static std::shared_ptr<SoundManager> instance() {
 		if (isSetUp) {
 			if (!pManager)
@@ -40,23 +41,8 @@ public:
 	}
 
 	// retrun index of the file
+	// 返回音频的索引
 	std::size_t load(const char *fileName) {
-		//ALenum format;
-		//ALsizei size;
-		//ALvoid* data;
-		//ALsizei freq;
-		//ALboolean loop;
-
-		//ALuint buffer;
-
-		//// 载入WAV数据  
-		//alGenBuffers(1, &buffer);
-		//if (alGetError() != AL_NO_ERROR)
-		//	return AL_FALSE;
-
-		//alutLoadWAVFile(fileName, &format, &data, &size, &freq, &loop);
-		//alBufferData(buffer, format, data, size, freq);
-		//alutUnloadWAV(format, data, size, freq);
 		ALuint buffer = alutCreateBufferFromFile(fileName);
 
 		ALuint source;
@@ -68,7 +54,6 @@ public:
 		alSourcef(source, AL_GAIN, 1.0f);
 		alSourcefv(source, AL_POSITION, sourcePos);
 		alSourcefv(source, AL_VELOCITY, sourceVel);
-		// alSourcei(source, AL_LOOPING, loop);
 
 		sounds.push_back({ source, buffer });
 		return sounds.size() - 1;

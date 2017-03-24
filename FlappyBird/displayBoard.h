@@ -5,6 +5,9 @@
 #include "board.h"
 #include "GL\SOIL.h"
 
+/*
+\ 表示可变化的展板，用于实现动画
+*/
 class DisplayBoard : public Board {
 public:
 	DisplayBoard(const std::vector<const char*> &texs, 
@@ -18,8 +21,7 @@ public:
 
 			int textureWidth, textureHeight;
 			unsigned char* image = SOIL_load_image(texs[i], &textureWidth, &textureHeight, 0, SOIL_LOAD_RGBA);
-			// **************
-			cout << i << " " << SOIL_last_result() << endl;
+		
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
 			glGenerateMipmap(GL_TEXTURE_2D);
 

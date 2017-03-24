@@ -12,6 +12,7 @@
 #include "config.h"
 
 
+// 用于解耦，分离具体的顶点参数
 namespace BoardSp
 {
 	auto deletor = [](GLfloat *p) {delete[] p; };
@@ -36,6 +37,9 @@ namespace BoardSp
 }
 
 
+/*
+\ 表示静态展板的类，用于贴上纹理
+*/
 class Board : public DrawAble {
 public:
 	Board(const char *tex, const glm::vec3 pos = { 0.0f, 0.0f, 0.0f }, const glm::vec3 scale = { 1.0f, 1.0f, 1.0f })

@@ -10,7 +10,9 @@ namespace utility {
 	// 前置申明
 	class CollisionWorld;
 
-	// Proxy (加入碰撞世界或从中移除) 
+	/* Proxy (加入碰撞世界或从中移除) 
+	\  用于表示可碰撞的物体，是一个代理类
+	*/
 	class Collidable {
 		friend class CollisionWorld;
 	public:
@@ -53,7 +55,7 @@ namespace utility {
 		glm::vec3 &position() noexcept { return (*this->itor_)->position(); }
 
 		operator RealCollidable() { return *(*this->itor_); }
-		operator RealCollidable() const { return *(*this->itor_); }
+		operator const RealCollidable() const { return *(*this->itor_); }
 
 
 		// Real Subject

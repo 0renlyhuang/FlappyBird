@@ -6,7 +6,7 @@
 #include "displayBoard.h"
 #include "drawAble.h"
 
-
+// 用于展示分数的展板
 class ScoreBoard : public DrawAble {
 public:
 	ScoreBoard(const glm::vec3 pos = { 0.0f, 0.0f, 0.0f }, 

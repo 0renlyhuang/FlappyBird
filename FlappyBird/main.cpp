@@ -44,17 +44,14 @@ unique_ptr<Button> pOKButton;
 unique_ptr<Board> pBackground;
 unique_ptr<Board> pTitle;
 unique_ptr<Board> pGameOver;
-//unique_ptr<DisplayBoard> pFlashBoard;
 unique_ptr<Bird> pBird;
 unique_ptr<ScoreBoard> pScore;
 std::vector<unique_ptr<Tube>> tubes;
 unique_ptr<Shader> pButtonShader;
 unique_ptr<Shader> pTubeShader;
-// unique_ptr<Shader> pBirdShader;
 unique_ptr<Shader> pBoardShader;
 
 int currTube = 0;  // Index
-enum {EMPTY = 0, WHITE, BLACK};
 std::size_t wingSound;
 std::size_t pointSound;
 std::size_t dieSound;
@@ -80,18 +77,11 @@ int main(int argc, char **argv) {
 
 	init();
 
-	for (auto &ptube : tubes) {
-		std::cout << "(" <<
-			ptube->position().x <<
-			", " << ptube->position().y << ")\n";
-	}
-
 	glutDisplayFunc(display);
 	glutIdleFunc(display);
 	glutKeyboardFunc(spaceDown);
 	glutKeyboardUpFunc(spaceUp);
 	glutMouseFunc(mouseClick);
-	//glutMotionFunc(mouseMoveDetetor);
 
 
 	glutMainLoop();
@@ -113,17 +103,12 @@ void init() {
 
 	pBackground = std::make_unique<Board>("texture//background.png", glm::vec3{0.0f, 0.0f, 0.0f}, glm::vec3{10.0f, 10.0f, 1.0f});
 	
-	//pFlashBoard = std::make_unique<DisplayBoard>(
-	//	std::vector<const char*>{ "texture//empty.png", "texture//white.png", "texture//black.png" },
-	//	glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 10.0f, 10.0f, 1.0f }
-	//);
 	
 	pBoardShader = std::make_unique<Shader>("board.vert", "board.frag");
 
 	pScore = std::make_unique<ScoreBoard>(glm::vec3{ 0.0f, 400.0f, 0.0f }, glm::vec3{ 0.26f, 0.36f, 1.0f }, 0);
 
 	pBird = std::make_unique<Bird>(glm::vec3{ 0.0f, -109.693f, 0.0f });
-	// pBirdShader = std::make_unique<Shader>("bird.vert", "bird.frag");
 
 	std::default_random_engine e;
 
@@ -143,13 +128,14 @@ void init() {
 }
 
 
+// 重置游戏
 void reInit() {
 	pBird = std::make_unique<Bird>(glm::vec3{ 0.0f, -109.693f, 0.0f });
 	std::default_random_engine e;
 	tubes.clear();
 	for (int i = 0; i < tubeNum; ++i) {
 		tubes.emplace_back(std::make_unique<Tube>(
-			glm::vec3(500.0f + 400.0f * static_cast<float>(i), (static_cast<int>(e() % 6) - 3) * 80.0f, 0.0f/*30.0f, -160.0f, 0.0f*/)
+			glm::vec3(500.0f + 400.0f * static_cast<float>(i), (static_cast<int>(e() % 6) - 3) * 80.0f, 0.0f)
 			));
 	}
 	currTube = 0;
@@ -166,6 +152,7 @@ void display() {
 	deltaTime = currFrame - lastFrame;
 	lastFrame = currFrame;
 	
+	// 如果游戏还未开始,画开始按钮,标题
 	if (!isStarted) {
 		pButtonShader->use();
 		pStartButton->draw(*pButtonShader);
@@ -173,17 +160,20 @@ void display() {
 		pBoardShader->use();
 		pTitle->draw(*pBoardShader);
 		
+		// 如果上一次游戏结束,重新开始
 		if (isOver) {
 			isOver = false;
 			reInit();
 		}
 	}
+	// 如果游戏结束，画出重新开始的按钮，提示
 	else if (isOver) {
 		pBoardShader->use();
 		pGameOver->draw(*pBoardShader);
 		pButtonShader->use();
 		pOKButton->draw(*pButtonShader);
 	}
+	// 如果游戏正在进行，画出积分板，画鸟，画管子
 	else {
 		pBoardShader->use();
 		pScore->draw(*pBoardShader);
@@ -197,6 +187,7 @@ void display() {
 
 		pBird->fall(deltaTime);
 		
+		// 确定翅膀扇动的频率
 		static int flutterRate = 0;
 		++flutterRate;
 		if (flutterRate % 10 == 0)
@@ -221,7 +212,7 @@ void display() {
 				|| pBird->collisionDetect(tubes[currTube - 1]->getDownBox())
 				|| pBird->collisionDetect(tubes[currTube - 1]->getUpBox())
 				: pBird->collisionDetect(tubes[currTube]->getDownBox()) || pBird->collisionDetect(tubes[currTube]->getUpBox())) {
-				cout << "\nCollide\n";
+				// cout << "\nCollide\n";
 				// system("Pause");
 				SoundManager::instance()->play(hitSound);
 				SoundManager::instance()->play(dieSound);
@@ -246,7 +237,7 @@ void display() {
 }
 
 
-#include  <future>
+// 判断空格是否按下
 void spaceDown(unsigned char key, int, int) {
 	if (key == ' ') {
 		if (isStarted && !isOver) {
@@ -265,15 +256,14 @@ void spaceDown(unsigned char key, int, int) {
 	}
 }
 
+// 判断空格是否抬起
 void spaceUp(unsigned char key, int, int) {
 	if (key == ' ') {
 		isSpaceDown = false;
 	}
-	if (key == 'a') {
-		// pStartButton->up();
-	}
 }
 
+// 处理鼠标点击事件
 void mouseClick(int button, int state, int x, int y) {
 	if (button == GLUT_LEFT_BUTTON) {
 		if (state == GLUT_DOWN) {
@@ -297,7 +287,6 @@ void mouseClick(int button, int state, int x, int y) {
 			if (isOver && OKButtonDown) {
 				pOKButton->up();
 				OKButtonDown = false;
-				// isOver = false;
 				isStarted = false;			
 			}
 		}
